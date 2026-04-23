@@ -169,8 +169,8 @@ export default function ContactPage() {
               Envie o contexto e eu recebo sua solicitacao direto no e-mail.
             </h2>
             <p className="mt-5 text-base leading-8 text-stone-300">
-              O formulario envia seus dados pelo EmailJS com os campos certos para
-              eu receber nome, e-mail, WhatsApp, servico e contexto do negocio.
+              O formulario organiza seus dados para eu receber nome, e-mail,
+              WhatsApp, servico e contexto do negocio de forma clara.
             </p>
 
             <div className="mt-8 grid gap-4">
@@ -187,8 +187,8 @@ export default function ContactPage() {
                 },
                 {
                   icon: Mail,
-                  title: "Campos certos no template",
-                  text: "Nome, e-mail, WhatsApp, servico, autorizacao e contexto seguem no formato do EmailJS.",
+                  title: "Mensagem organizada",
+                  text: "Nome, e-mail, WhatsApp, servico, autorizacao e contexto chegam bem estruturados para resposta.",
                 },
               ].map((item) => (
                 <div key={item.title} className="flex gap-3">

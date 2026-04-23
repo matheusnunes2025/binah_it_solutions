@@ -57,8 +57,9 @@ export function ContactForm() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formElement = event.currentTarget;
 
-    const formData = new FormData(event.currentTarget);
+    const formData = new FormData(formElement);
     const rawData = {
       nome_completo: formData.get("nome_completo"),
       email: formData.get("email"),
@@ -131,13 +132,13 @@ export function ContactForm() {
         message: "Mensagem enviada com sucesso. Vou receber no e-mail e retorno o quanto antes.",
       });
 
-      event.currentTarget.reset();
+      formElement.reset();
+      setErrors({});
     } catch (error) {
       console.error(error);
       setStatus({
         type: "error",
-        message:
-          "Nao consegui enviar agora pelo EmailJS. Tente novamente ou use o WhatsApp ao lado.",
+        message: "Nao consegui enviar agora. Tente novamente ou use o WhatsApp ao lado.",
       });
     } finally {
       setLoading(false);
