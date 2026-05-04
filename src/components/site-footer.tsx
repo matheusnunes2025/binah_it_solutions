@@ -32,6 +32,12 @@ export function SiteFooter() {
                 {item.label}
               </Link>
             ))}
+            <Link
+              href="/politica-de-privacidade"
+              className="text-sm text-stone-400 transition hover:text-stone-50"
+            >
+              Política de Privacidade
+            </Link>
           </div>
         </div>
 
