@@ -6,22 +6,22 @@ import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
 import { SocialIcon } from "@/components/social-icon";
-import { contact, navItems, whatsappLink } from "@/lib/site";
+import { navItems, whatsappLink } from "@/lib/site";
 
 export function SiteHeader() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-brand-bg/92 backdrop-blur-xl">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
+    <header className="sticky top-0 z-50 border-b border-[#B9A796]/35 bg-[#F8F5ED]/94 backdrop-blur-xl">
+      <div className="site-container flex h-20 items-center justify-between">
         <Link
           href="/"
           className="group flex items-center gap-3"
           onClick={() => setIsOpen(false)}
-          aria-label="Binah IT - Home"
+          aria-label="Binah IT Solutions - Home"
         >
-          <BrandLogo size="sm" />
+          <BrandLogo size="sm" lightBg />
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex" aria-label="Menu principal">
@@ -34,8 +34,8 @@ export function SiteHeader() {
                 href={item.href}
                 className={`rounded-[8px] px-4 py-2 text-sm font-medium transition ${
                   isActive
-                    ? "bg-brand-surface-strong text-stone-50 ring-1 ring-inset ring-brand-accent-border"
-                    : "text-stone-300 hover:bg-white/8 hover:text-white"
+                    ? "bg-[#2D2D2D] text-[#F8F5ED] ring-1 ring-inset ring-[#C8A679]/45"
+                    : "text-[#2D2D2D] hover:bg-[#EFE7DA] hover:text-[#1E1E1E]"
                 }`}
               >
                 {item.label}
@@ -44,30 +44,19 @@ export function SiteHeader() {
           })}
         </nav>
 
-        <div className="hidden items-center gap-3 md:flex">
-          <a
-            href={contact.instagramUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="grid size-10 place-items-center rounded-[8px] border border-white/10 text-stone-300 transition hover:border-brand-accent-border hover:bg-brand-accent-soft"
-            aria-label="Instagram da Binah IT"
-          >
-            <SocialIcon type="instagram" size={21} label="Instagram da Binah IT" />
-          </a>
-          <a
-            href={whatsappLink()}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 rounded-[8px] bg-brand-accent px-4 py-2.5 text-sm font-semibold text-[#180d07] transition hover:bg-brand-accent-strong"
-          >
-            <SocialIcon type="whatsapp" size={19} label="WhatsApp da Binah IT" />
-            Falar no WhatsApp
-          </a>
-        </div>
+        <a
+          href={whatsappLink()}
+          target="_blank"
+          rel="noreferrer"
+          className="hidden items-center gap-2 rounded-[8px] bg-[#C8A679] px-4 py-2.5 text-sm font-semibold text-[#180d07] transition hover:bg-[#5B331A] hover:text-[#F8F5ED] md:inline-flex"
+        >
+          <SocialIcon type="whatsapp" size={19} label="WhatsApp da Binah IT Solutions" />
+          Falar no WhatsApp
+        </a>
 
         <button
           type="button"
-          className="grid size-11 place-items-center rounded-[8px] border border-white/10 text-stone-100 md:hidden"
+          className="grid size-11 place-items-center rounded-[8px] border border-[#B9A796]/45 text-[#1E1E1E] md:hidden"
           onClick={() => setIsOpen((value) => !value)}
           aria-label={isOpen ? "Fechar menu" : "Abrir menu"}
           aria-expanded={isOpen}
@@ -77,34 +66,25 @@ export function SiteHeader() {
       </div>
 
       {isOpen ? (
-        <div className="border-t border-white/10 bg-brand-surface px-5 py-5 md:hidden">
-          <nav className="mx-auto flex max-w-7xl flex-col gap-2" aria-label="Menu mobile">
+        <div className="border-t border-[#B9A796]/30 bg-[#EFE7DA] px-5 py-5 md:hidden">
+          <nav className="mx-auto flex max-w-[var(--container)] flex-col gap-2" aria-label="Menu mobile">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="rounded-[8px] px-4 py-3 text-base font-medium text-stone-100 hover:bg-white/8"
+                className="rounded-[8px] px-4 py-3 text-base font-medium text-[#1E1E1E] hover:bg-[#F8F5ED]"
                 onClick={() => setIsOpen(false)}
               >
                 {item.label}
               </Link>
             ))}
             <a
-              href={contact.instagramUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-2 inline-flex items-center justify-center gap-2 rounded-[8px] border border-white/10 px-4 py-3 text-base font-semibold text-stone-100 hover:border-brand-accent-border hover:bg-brand-accent-soft"
-            >
-              <SocialIcon type="instagram" size={20} label="Instagram da Binah IT" />
-              Instagram
-            </a>
-            <a
               href={whatsappLink()}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-[8px] bg-brand-accent px-4 py-3 text-base font-semibold text-[#180d07]"
+              className="mt-2 inline-flex items-center justify-center gap-2 rounded-[8px] bg-[#C8A679] px-4 py-3 text-base font-semibold text-[#180d07] transition hover:bg-[#5B331A] hover:text-[#F8F5ED]"
             >
-              <SocialIcon type="whatsapp" size={20} label="WhatsApp da Binah IT" />
+              <SocialIcon type="whatsapp" size={20} label="WhatsApp da Binah IT Solutions" />
               Falar no WhatsApp
             </a>
           </nav>

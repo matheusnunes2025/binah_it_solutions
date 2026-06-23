@@ -6,67 +6,86 @@ import { contact, navItems, whatsappLink } from "@/lib/site";
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-white/10 bg-brand-bg">
-      <div className="mx-auto grid max-w-7xl gap-8 px-5 py-10 sm:px-8 md:grid-cols-[1.2fr_0.8fr_1fr] lg:px-10">
+    <footer className="border-t border-[#B9A796]/35 bg-[#EFE7DA]">
+      <div className="site-container grid gap-10 py-12 md:grid-cols-[1.2fr_0.8fr_1fr]">
         <div>
-          <div className="flex items-center gap-3">
-            <BrandLogo size="md" />
-          </div>
-          <p className="mt-5 max-w-sm text-sm leading-7 text-stone-400">
-            Presenca digital pensada para gerar confianca, facilitar o contato
-            e ajudar sua empresa a ser encontrada por novos clientes.
+          <BrandLogo size="md" lightBg />
+          <p className="mt-5 max-w-sm text-sm leading-7 text-[#2D2D2D]">
+            Sites, anúncios e infraestrutura para empresas.
           </p>
         </div>
 
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-accent-strong">
-            Paginas
-          </p>
-          <div className="mt-4 flex flex-col gap-3">
-            {navItems.map((item) => (
+        <div className="grid gap-8 sm:grid-cols-2">
+          <div>
+            <p className="text-sm font-semibold uppercase text-[#5B331A]">Páginas</p>
+            <div className="mt-4 flex flex-col gap-3">
+              {navItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="text-sm text-[#2D2D2D] transition hover:text-[#5B331A]"
+                >
+                  {item.label}
+                </Link>
+              ))}
               <Link
-                key={item.href}
-                href={item.href}
-                className="text-sm text-stone-400 transition hover:text-stone-50"
+                href="/politica-de-privacidade"
+                className="text-sm text-[#2D2D2D] transition hover:text-[#5B331A]"
               >
-                {item.label}
+                Política de Privacidade
               </Link>
-            ))}
-            <Link
-              href="/politica-de-privacidade"
-              className="text-sm text-stone-400 transition hover:text-stone-50"
-            >
-              Política de Privacidade
-            </Link>
+            </div>
+          </div>
+
+          <div>
+            <p className="text-sm font-semibold uppercase text-[#5B331A]">Segmentos</p>
+            <div className="mt-4 flex flex-col gap-3">
+              <Link
+                href="/sites-para-nutricionistas"
+                className="text-sm text-[#2D2D2D] transition hover:text-[#5B331A]"
+              >
+                Sites para nutricionistas
+              </Link>
+              <Link
+                href="/infraestrutura-de-ti-para-empresas"
+                className="text-sm text-[#2D2D2D] transition hover:text-[#5B331A]"
+              >
+                Infraestrutura de TI
+              </Link>
+              <Link
+                href="/sites-para-engenharia-arquitetura-construtoras"
+                className="text-sm text-[#2D2D2D] transition hover:text-[#5B331A]"
+              >
+                Engenharia e arquitetura
+              </Link>
+            </div>
           </div>
         </div>
 
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-accent-strong">
-            Contato
-          </p>
+          <p className="text-sm font-semibold uppercase text-[#5B331A]">Contato</p>
           <div className="mt-4 flex flex-col gap-3">
             <a
               href={whatsappLink()}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-stone-300 transition hover:text-brand-accent-strong"
+              className="inline-flex items-center gap-2 text-sm text-[#2D2D2D] transition hover:text-[#5B331A]"
             >
-              <SocialIcon type="whatsapp" size={19} label="WhatsApp da Binah IT" />
+              <SocialIcon type="whatsapp" size={19} label="WhatsApp da Binah IT Solutions" />
               {contact.phoneDisplay}
             </a>
             <a
               href={contact.instagramUrl}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-stone-300 transition hover:text-brand-accent-strong"
+              className="inline-flex items-center gap-2 text-sm text-[#2D2D2D] transition hover:text-[#5B331A]"
             >
-              <SocialIcon type="instagram" size={19} label="Instagram da Binah IT" />
+              <SocialIcon type="instagram" size={19} label="Instagram da Binah IT Solutions" />
               {contact.instagramHandle}
             </a>
             <a
               href={`mailto:${contact.email}`}
-              className="inline-flex items-center gap-2 text-sm text-stone-300 transition hover:text-brand-accent-strong"
+              className="inline-flex items-center gap-2 text-sm text-[#2D2D2D] transition hover:text-[#5B331A]"
             >
               <Mail size={18} />
               {contact.email}
@@ -74,8 +93,8 @@ export function SiteFooter() {
           </div>
         </div>
       </div>
-      <div className="border-t border-white/10 px-5 py-5 text-center text-xs text-stone-500">
-        Binah IT. Desenvolvimento de presenca digital para empresas.
+      <div className="border-t border-[#B9A796]/35 px-5 py-5 text-center text-xs text-[#5B331A]">
+        Binah IT Solutions — tecnologia para empresas.
       </div>
     </footer>
   );

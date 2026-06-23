@@ -2,7 +2,7 @@
 
 ## Logo
 
-**Arquivo:** `public/images/logo-binah-ember.png`
+**Arquivo:** `public/images/logo.png`
 
 ```text
 Use case: logo-brand

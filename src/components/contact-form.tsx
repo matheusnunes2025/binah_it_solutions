@@ -11,26 +11,34 @@ const EMAILJS_SERVICE_ID = "service_ml7818r";
 const EMAILJS_TEMPLATE_ID = "template_r8oi8eh";
 
 const serviceOptions = [
-  { value: "Criacao de site", label: "Criacao de site" },
-  { value: "Landing pages e captacao", label: "Landing pages e captacao" },
-  { value: "Google Meu Negocio", label: "Google Meu Negocio" },
-  { value: "Estrutura para buscas no Google", label: "Estrutura para buscas no Google" },
-  { value: "Campanhas no Google Ads", label: "Campanhas no Google Ads" },
-  { value: "Campanhas no Meta Ads", label: "Campanhas no Meta Ads" },
-  { value: "Site + Google + anuncios", label: "Site + Google + anuncios" },
-  { value: "Quero entender a melhor solucao", label: "Quero entender a melhor solucao" },
+  { value: "Landing pages", label: "Landing pages" },
+  { value: "Sites profissionais", label: "Sites profissionais" },
+  { value: "Estrutura para buscas", label: "Estrutura para buscas" },
+  { value: "Google Ads", label: "Google Ads" },
+  { value: "Meta Ads", label: "Meta Ads" },
+  {
+    value: "Infraestrutura de TI e redes",
+    label: "Infraestrutura de TI e redes",
+  },
+  {
+    value: "Site, anúncios e infraestrutura",
+    label: "Site, anúncios e infraestrutura",
+  },
+  { value: "Quero entender o melhor caminho", label: "Quero entender o melhor caminho" },
 ] as const;
 
-const defaultService = "Site + Google + anuncios";
+const defaultService = "Site, anúncios e infraestrutura";
 
 const contactSchema = z.object({
-  nome_completo: z.string().trim().min(2, "Informe seu nome."),
-  email: z.email("Informe um e-mail valido."),
-  whatsapp: z.string().trim().min(8, "Informe um WhatsApp valido."),
+  nome_completo: z.string().trim().min(2, "Informe seu nome completo."),
+  email: z.email("Informe um e-mail válido."),
+  whatsapp: z.string().trim().min(8, "Informe um WhatsApp válido."),
   empresa: z.string().trim().optional(),
-  servico: z.string().trim().min(2, "Escolha um tipo de servico."),
-  sobre_negocio: z.string().trim().min(10, "Conte rapidamente o que voce precisa."),
-  autorizo_contato: z.boolean(),
+  servico: z.string().trim().min(2, "Escolha o interesse principal."),
+  sobre_negocio: z.string().trim().min(10, "Conte um pouco sobre o seu negócio."),
+  autorizo_contato: z
+    .boolean()
+    .refine((value) => value, "Autorize o contato para que possamos responder."),
 });
 
 type StatusState = {
@@ -39,10 +47,10 @@ type StatusState = {
 };
 
 function fieldClass(hasError: boolean) {
-  return `mt-2 w-full rounded-[8px] border bg-white/[0.04] px-4 py-3 text-sm text-stone-50 outline-none transition placeholder:text-stone-500 ${
+  return `mt-2 w-full rounded-[8px] border bg-[#F8F5ED] px-4 py-3 text-sm text-[#1E1E1E] outline-none transition placeholder:text-stone-400 ${
     hasError
-      ? "border-red-400 focus:border-red-300"
-      : "border-white/10 focus:border-brand-accent"
+      ? "border-red-500 focus:border-red-400"
+      : "border-[#B9A796]/50 focus:border-[#C8A679]"
   }`;
 }
 
@@ -110,7 +118,7 @@ export function ContactForm() {
       sobre_negocio: data.empresa
         ? `Empresa: ${data.empresa}\n\n${data.sobre_negocio}`
         : data.sobre_negocio,
-      autorizo_contato: data.autorizo_contato ? "Sim" : "Nao",
+      autorizo_contato: data.autorizo_contato ? "Sim" : "Não",
       empresa: data.empresa || "-",
       time,
       to_email: contact.email,
@@ -118,18 +126,13 @@ export function ContactForm() {
     };
 
     try {
-      await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        templateParams,
-        {
-          publicKey: EMAILJS_PUBLIC_KEY,
-        }
-      );
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams, {
+        publicKey: EMAILJS_PUBLIC_KEY,
+      });
 
       setStatus({
         type: "success",
-        message: "Mensagem enviada com sucesso. Vou receber no e-mail e retorno o quanto antes.",
+        message: "Solicitação enviada. A Binah IT retornará com uma orientação inicial.",
       });
 
       formElement.reset();
@@ -138,7 +141,8 @@ export function ContactForm() {
       console.error(error);
       setStatus({
         type: "error",
-        message: "Nao consegui enviar agora. Tente novamente ou use o WhatsApp ao lado.",
+        message:
+          "Não foi possível enviar agora. Você pode chamar diretamente pelo WhatsApp.",
       });
     } finally {
       setLoading(false);
@@ -148,11 +152,21 @@ export function ContactForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-[8px] border border-white/10 bg-brand-surface/70 p-5 shadow-2xl shadow-black/30 sm:p-6"
+      className="rounded-[8px] border border-[#B9A796]/45 bg-white p-5 shadow-[var(--shadow-soft)] sm:p-6"
       noValidate
     >
-      <div className="grid gap-5 sm:grid-cols-2">
-        <label className="text-sm font-medium text-stone-200">
+      <div>
+        <p className="eyebrow">Conte seu projeto</p>
+        <h2 className="mt-3 font-serif text-3xl font-semibold leading-tight text-[#1E1E1E]">
+          Contexto ajuda na resposta.
+        </h2>
+        <p className="mt-4 text-sm leading-7 text-[#2D2D2D]">
+          Preencha os dados e retornamos com o próximo passo.
+        </p>
+      </div>
+
+      <div className="mt-6 grid gap-5 sm:grid-cols-2">
+        <label className="text-sm font-semibold text-[#2D2D2D]">
           Nome completo
           <input
             name="nome_completo"
@@ -161,25 +175,25 @@ export function ContactForm() {
             autoComplete="name"
           />
           {errors.nome_completo ? (
-            <span className="mt-2 block text-xs text-red-300">{errors.nome_completo}</span>
+            <span className="mt-2 block text-xs font-medium text-red-600">{errors.nome_completo}</span>
           ) : null}
         </label>
 
-        <label className="text-sm font-medium text-stone-200">
+        <label className="text-sm font-semibold text-[#2D2D2D]">
           E-mail
           <input
             name="email"
             type="email"
             className={fieldClass(Boolean(errors.email))}
-            placeholder="voce@empresa.com"
+            placeholder="nome@empresa.com"
             autoComplete="email"
           />
           {errors.email ? (
-            <span className="mt-2 block text-xs text-red-300">{errors.email}</span>
+            <span className="mt-2 block text-xs font-medium text-red-600">{errors.email}</span>
           ) : null}
         </label>
 
-        <label className="text-sm font-medium text-stone-200">
+        <label className="text-sm font-semibold text-[#2D2D2D]">
           WhatsApp
           <input
             name="whatsapp"
@@ -188,11 +202,11 @@ export function ContactForm() {
             autoComplete="tel"
           />
           {errors.whatsapp ? (
-            <span className="mt-2 block text-xs text-red-300">{errors.whatsapp}</span>
+            <span className="mt-2 block text-xs font-medium text-red-600">{errors.whatsapp}</span>
           ) : null}
         </label>
 
-        <label className="text-sm font-medium text-stone-200">
+        <label className="text-sm font-semibold text-[#2D2D2D]">
           Empresa
           <input
             name="empresa"
@@ -201,11 +215,11 @@ export function ContactForm() {
             autoComplete="organization"
           />
           {errors.empresa ? (
-            <span className="mt-2 block text-xs text-red-300">{errors.empresa}</span>
+            <span className="mt-2 block text-xs font-medium text-red-600">{errors.empresa}</span>
           ) : null}
         </label>
 
-        <label className="text-sm font-medium text-stone-200 sm:col-span-2">
+        <label className="text-sm font-semibold text-[#2D2D2D] sm:col-span-2">
           Interesse principal
           <select
             name="servico"
@@ -213,48 +227,51 @@ export function ContactForm() {
             className={fieldClass(Boolean(errors.servico))}
           >
             {serviceOptions.map((option) => (
-              <option key={option.value} className="bg-brand-surface" value={option.value}>
+              <option key={option.value} className="bg-white text-[#1E1E1E]" value={option.value}>
                 {option.label}
               </option>
             ))}
           </select>
           {errors.servico ? (
-            <span className="mt-2 block text-xs text-red-300">{errors.servico}</span>
+            <span className="mt-2 block text-xs font-medium text-red-600">{errors.servico}</span>
           ) : null}
         </label>
       </div>
 
-      <label className="mt-5 block text-sm font-medium text-stone-200">
-        Sobre seu negocio
+      <label className="mt-5 block text-sm font-semibold text-[#2D2D2D]">
+        Sobre o negócio
         <textarea
           name="sobre_negocio"
           rows={5}
           className={fieldClass(Boolean(errors.sobre_negocio))}
-          placeholder="Conte o que sua empresa vende, o que quer melhorar e como pretende captar mais clientes."
+          placeholder="O que sua empresa faz e o que você precisa melhorar?"
         />
         {errors.sobre_negocio ? (
-          <span className="mt-2 block text-xs text-red-300">{errors.sobre_negocio}</span>
+          <span className="mt-2 block text-xs font-medium text-red-600">{errors.sobre_negocio}</span>
         ) : null}
       </label>
 
-      <label className="mt-5 flex items-start gap-3 rounded-[8px] border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-stone-300">
+      <label className="mt-5 flex items-start gap-3 rounded-[8px] border border-[#B9A796]/40 bg-[#F8F5ED] px-4 py-3 text-sm text-[#2D2D2D]">
         <input
           type="checkbox"
           name="autorizo_contato"
           defaultChecked
-          className="mt-1 size-4 rounded border-white/20 accent-brand-accent"
+          className="mt-1 size-4 rounded border-[#B9A796] accent-[#C8A679]"
         />
-        <span>
-          Autorizo contato por e-mail ou WhatsApp para retorno sobre minha solicitacao.
-        </span>
+        <span>Autorizo contato por e-mail ou WhatsApp para retorno sobre minha solicitação.</span>
       </label>
+      {errors.autorizo_contato ? (
+        <span className="mt-2 block text-xs font-medium text-red-600">
+          {errors.autorizo_contato}
+        </span>
+      ) : null}
 
       {status.type !== "idle" ? (
         <div
           className={`mt-5 rounded-[8px] border px-4 py-3 text-sm leading-6 ${
             status.type === "success"
-              ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-200"
-              : "border-red-400/40 bg-red-400/10 text-red-200"
+              ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+              : "border-red-200 bg-red-50 text-red-800"
           }`}
         >
           <div className="flex items-start gap-2">
@@ -264,14 +281,19 @@ export function ContactForm() {
         </div>
       ) : null}
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-[8px] bg-brand-accent px-5 py-3.5 text-sm font-semibold text-[#180d07] transition hover:bg-brand-accent-strong disabled:cursor-not-allowed disabled:opacity-80 sm:w-auto"
-      >
-        <Send size={18} />
-        {loading ? "Enviando..." : "Enviar solicitacao"}
-      </button>
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <button
+          type="submit"
+          disabled={loading}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-[8px] bg-[#C8A679] px-5 py-3.5 text-sm font-semibold text-[#180d07] transition hover:bg-[#5B331A] hover:text-[#F8F5ED] disabled:cursor-not-allowed disabled:opacity-80 sm:w-auto"
+        >
+          <Send size={18} />
+          {loading ? "Enviando..." : "Enviar solicitação"}
+        </button>
+        <p className="text-sm leading-6 text-stone-600">
+          Também é possível chamar direto pelo WhatsApp.
+        </p>
+      </div>
     </form>
   );
 }

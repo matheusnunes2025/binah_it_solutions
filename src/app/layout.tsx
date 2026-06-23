@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import { buildBaseJsonLd, serializeJsonLd, siteConfig } from "@/lib/seo";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -15,11 +15,17 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  weight: ["600", "700"],
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
     default: siteConfig.defaultTitle,
-    template: "%s | Binah IT",
+    template: "%s",
   },
   description: siteConfig.description,
   applicationName: siteConfig.name,
@@ -33,7 +39,10 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.webmanifest",
   icons: {
-    icon: "/icon.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png" },
+    ],
     apple: "/apple-icon.png",
   },
   robots: {
@@ -59,7 +68,7 @@ export const metadata: Metadata = {
         url: siteConfig.ogImage,
         width: 1600,
         height: 900,
-        alt: "Binah IT - sites, Google e anuncios para captar clientes",
+        alt: "Binah IT Solutions - sites, anúncios e infraestrutura de TI para empresas",
       },
     ],
   },
@@ -82,9 +91,9 @@ export default function RootLayout({
     <html
       lang="pt-BR"
       data-scroll-behavior="smooth"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-brand-bg text-stone-50">
+      <body className="min-h-full bg-brand-bg text-foreground">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: serializeJsonLd(baseJsonLd) }}
