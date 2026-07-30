@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { absoluteUrl } from "@/lib/seo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date("2026-06-23T00:00:00-03:00");
+  const lastModified = new Date("2026-07-30T00:00:00-03:00");
 
   return [
     {
@@ -10,6 +10,39 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified,
       changeFrequency: "weekly",
       priority: 1,
+      alternates: {
+        languages: {
+          en: absoluteUrl("/"),
+          "pt-BR": absoluteUrl("/pt-br"),
+          es: absoluteUrl("/es"),
+        },
+      },
+    },
+    {
+      url: absoluteUrl("/pt-br"),
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 1,
+      alternates: {
+        languages: {
+          en: absoluteUrl("/"),
+          "pt-BR": absoluteUrl("/pt-br"),
+          es: absoluteUrl("/es"),
+        },
+      },
+    },
+    {
+      url: absoluteUrl("/es"),
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 1,
+      alternates: {
+        languages: {
+          en: absoluteUrl("/"),
+          "pt-BR": absoluteUrl("/pt-br"),
+          es: absoluteUrl("/es"),
+        },
+      },
     },
     {
       url: absoluteUrl("/servicos"),
@@ -46,6 +79,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified,
       changeFrequency: "monthly",
       priority: 0.78,
+    },
+    {
+      url: absoluteUrl("/privacy"),
+      lastModified,
+      changeFrequency: "yearly",
+      priority: 0.25,
+    },
+    {
+      url: absoluteUrl("/pt-br/privacidade"),
+      lastModified,
+      changeFrequency: "yearly",
+      priority: 0.25,
+    },
+    {
+      url: absoluteUrl("/es/privacidad"),
+      lastModified,
+      changeFrequency: "yearly",
+      priority: 0.25,
     },
   ];
 }
