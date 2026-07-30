@@ -14,19 +14,20 @@ export const siteConfig = {
   shortName: "Binah IT",
   legalName: "Binah IT Solutions",
   url: "https://www.binahitsolutions.com",
-  locale: "en_US",
-  defaultTitle: "Binah IT Solutions | Digital systems for ambitious companies",
+  locale: "pt_BR",
+  defaultTitle: "Criação de Sites Profissionais | Binah IT Solutions",
   description:
-    "Corporate websites, acquisition systems and IT infrastructure for companies ready to scale with clarity.",
+    "Sites profissionais em Next.js, preparados para Google, anúncios e WhatsApp. Projetos a partir de R$ 2.490.",
   ogImage: "/images/og-binah-it-solutions.webp",
   keywords: [
-    "corporate website design",
-    "B2B landing pages",
+    "criação de sites profissionais",
+    "desenvolvimento de sites",
+    "site institucional",
+    "landing pages",
+    "sites em Next.js",
     "Meta Ads",
     "Google Ads",
-    "IT infrastructure",
-    "business networks",
-    "digital growth systems",
+    "SEO técnico",
   ],
 } as const;
 
@@ -40,15 +41,25 @@ export function buildPageMetadata({
   path = "/",
   keywords = [],
   locale = "pt_BR",
+  languagePaths,
 }: {
   title: string;
   description: string;
   path?: string;
   keywords?: string[];
   locale?: string;
+  languagePaths?: Record<string, string>;
 }): Metadata {
   const canonical = absoluteUrl(path);
   const image = absoluteUrl(siteConfig.ogImage);
+  const languages = languagePaths
+    ? Object.fromEntries(
+        Object.entries(languagePaths).map(([language, languagePath]) => [
+          language,
+          absoluteUrl(languagePath),
+        ]),
+      )
+    : undefined;
 
   return {
     title,
@@ -56,6 +67,7 @@ export function buildPageMetadata({
     keywords: [...new Set([...siteConfig.keywords, ...keywords])],
     alternates: {
       canonical,
+      languages,
     },
     openGraph: {
       type: "website",
@@ -98,8 +110,8 @@ export function buildLocalizedHomeMetadata(locale: Locale): Metadata {
     alternates: {
       canonical,
       languages: {
-        en: absoluteUrl("/"),
-        "pt-BR": absoluteUrl("/pt-br"),
+        en: absoluteUrl("/en"),
+        "pt-BR": absoluteUrl("/"),
         es: absoluteUrl("/es"),
         "x-default": absoluteUrl("/"),
       },
@@ -117,7 +129,7 @@ export function buildLocalizedHomeMetadata(locale: Locale): Metadata {
           url: image,
           width: 1600,
           height: 900,
-          alt: "Binah IT Solutions — digital platforms, acquisition and IT infrastructure",
+          alt: "Binah IT Solutions — criação de sites profissionais em Next.js",
         },
       ],
     },
@@ -140,8 +152,8 @@ export function buildLocalizedPrivacyMetadata(locale: Locale): Metadata {
     alternates: {
       canonical,
       languages: {
-        en: absoluteUrl("/privacy"),
-        "pt-BR": absoluteUrl("/pt-br/privacidade"),
+        en: absoluteUrl("/en/privacy"),
+        "pt-BR": absoluteUrl("/privacidade"),
         es: absoluteUrl("/es/privacidad"),
       },
     },
@@ -175,8 +187,10 @@ export function buildBaseJsonLd() {
         sameAs: [contact.instagramUrl],
         areaServed: "BR",
         serviceType: [
-          "Corporate digital platforms",
-          "Acquisition systems",
+          "Criação de sites profissionais",
+          "Desenvolvimento de sites em Next.js",
+          "Landing pages",
+          "SEO técnico",
           "Meta Ads",
           "Google Ads",
           "IT infrastructure and business networks",
@@ -199,7 +213,7 @@ export function buildBaseJsonLd() {
         url: siteConfig.url,
         name: siteConfig.name,
         description: siteConfig.description,
-        inLanguage: ["en", "pt-BR", "es"],
+        inLanguage: ["pt-BR", "en", "es"],
         publisher: {
           "@id": absoluteUrl("/#organization"),
         },

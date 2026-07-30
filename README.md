@@ -4,10 +4,13 @@ Site corporativo multilíngue da Binah IT Solutions, construído com Next.js 16,
 
 ## Rotas principais
 
-- `/` — inglês
-- `/pt-br` — português do Brasil
+- `/` — português do Brasil e homepage canônica
+- `/en` — inglês
 - `/es` — espanhol
-- `/privacy`, `/pt-br/privacidade`, `/es/privacidad` — avisos de privacidade localizados
+- `/privacidade`, `/en/privacy`, `/es/privacidad` — avisos de privacidade localizados
+- `/pt-br` — redirecionamento 301 para `/`
+- `/criacao-de-sites` — página principal de aquisição orgânica
+- `/portfolio`, `/en/work`, `/es/proyectos` — cases localizados
 
 As páginas principais possuem canonical, `hreflang`, Open Graph, FAQ em JSON-LD e entradas próprias no sitemap.
 
@@ -31,6 +34,15 @@ O componente de mensuração só carrega após consentimento explícito. Sem um 
 
 1. Copie `.env.example` para `.env.local`.
 2. Preencha `NEXT_PUBLIC_META_PIXEL_ID`.
+
+Para exibir um e-mail no domínio sem arriscar perda de mensagens, configure primeiro
+uma caixa postal ou encaminhamento funcional e depois preencha:
+
+```bash
+NEXT_PUBLIC_CONTACT_EMAIL=contato@binahitsolutions.com
+```
+
+Sem essa variável, o site mantém o endereço atual como fallback.
 3. Na Vercel, cadastre a mesma variável para Production e Preview.
 4. Faça um novo deploy.
 
@@ -40,7 +52,9 @@ Eventos implementados:
 - `Contact` nos CTAs de contato rastreáveis;
 - `Lead` somente depois do envio confirmado do formulário.
 
-O formulário também inclui UTMs, `fbclid`, URL da landing page, idioma, faixa de investimento e prazo no contexto enviado pelo EmailJS.
+O formulário inicial pede nome, WhatsApp, tipo de projeto e faixa de investimento.
+Ele também inclui UTMs, `fbclid`, URL da landing page e idioma no contexto enviado
+pelo EmailJS.
 
 ## Conteúdo e localização
 

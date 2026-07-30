@@ -20,7 +20,10 @@ export function SiteFooter() {
   const year = new Date().getFullYear();
 
   const nav = [
-    { href: `${home}#expertise`, label: copy.nav.services },
+    {
+      href: locale === "pt" ? "/criacao-de-sites" : `${home}#expertise`,
+      label: copy.nav.services,
+    },
     { href: `${home}#work`, label: copy.nav.work },
     { href: `${home}#approach`, label: copy.nav.approach },
     { href: `${home}#contact`, label: copy.nav.contact },

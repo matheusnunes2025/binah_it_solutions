@@ -43,19 +43,24 @@ export function ContactForm({ locale }: { locale: Locale }) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [status, setStatus] = useState<StatusState>({ type: "idle", message: "" });
   const [loading, setLoading] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
 
   const schema = z.object({
     full_name: z.string().trim().min(2, copy.errors.name),
-    email: z.string().trim().email(copy.errors.email),
     phone: z.string().trim().min(7, copy.errors.phone),
-    company: z.string().trim().min(2, copy.errors.company),
-    website: z.string().trim().optional(),
     service: z.string().trim().min(2, copy.errors.service),
     budget: z.string().trim().min(2, copy.errors.budget),
-    timeline: z.string().trim().min(2, copy.errors.timeline),
-    challenge: z.string().trim().min(20, copy.errors.challenge),
     consent: z.boolean().refine(Boolean, copy.errors.consent),
   });
+
+  function handleFormStart() {
+    if (hasStarted) return;
+    setHasStarted(true);
+    trackMetaEvent("FormStart", {
+      content_name: "project-proposal",
+      language: locale,
+    });
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -65,19 +70,15 @@ export function ContactForm({ locale }: { locale: Locale }) {
     if (String(formData.get("company_fax") || "").trim()) {
       setStatus({ type: "success", message: copy.success });
       formElement.reset();
+      setHasStarted(false);
       return;
     }
 
     const rawData = {
       full_name: String(formData.get("full_name") || ""),
-      email: String(formData.get("email") || ""),
       phone: String(formData.get("phone") || ""),
-      company: String(formData.get("company") || ""),
-      website: String(formData.get("website") || ""),
       service: String(formData.get("service") || ""),
       budget: String(formData.get("budget") || ""),
-      timeline: String(formData.get("timeline") || ""),
-      challenge: String(formData.get("challenge") || ""),
       consent: formData.get("consent") === "on",
     };
 
@@ -108,15 +109,9 @@ export function ContactForm({ locale }: { locale: Locale }) {
     });
 
     const context = [
-      `Company: ${data.company}`,
-      `Website: ${data.website || "-"}`,
       `Service: ${data.service}`,
       `Budget: ${data.budget}`,
-      `Timeline: ${data.timeline}`,
       `Language: ${locale}`,
-      "",
-      "Business challenge:",
-      data.challenge,
       "",
       "Attribution:",
       attributionText,
@@ -129,20 +124,20 @@ export function ContactForm({ locale }: { locale: Locale }) {
         EMAILJS_TEMPLATE_ID,
         {
           nome_completo: data.full_name,
-          email: data.email,
+          email: contact.email,
           whatsapp: data.phone,
           whatsapp_digits: data.phone.replace(/\D/g, ""),
-          empresa: data.company,
+          empresa: "Não informado no formulário inicial",
           servico: data.service,
           faixa_investimento: data.budget,
-          prazo: data.timeline,
-          site_atual: data.website || "-",
+          prazo: "A definir na conversa",
+          site_atual: "Não informado no formulário inicial",
           idioma: locale,
           sobre_negocio: context,
           autorizo_contato: data.consent ? "Yes / Sim / Sí" : "No",
           time: submittedAt,
           to_email: contact.email,
-          reply_to: data.email,
+          reply_to: contact.email,
         },
         { publicKey: EMAILJS_PUBLIC_KEY },
       );
@@ -150,11 +145,12 @@ export function ContactForm({ locale }: { locale: Locale }) {
       trackMetaEvent("Lead", {
         content_category: data.service,
         content_name: "project-assessment",
-        currency: locale === "pt" ? "BRL" : "USD",
+        currency: "BRL",
       });
 
       setStatus({ type: "success", message: copy.success });
       formElement.reset();
+      setHasStarted(false);
     } catch (error) {
       console.error(error);
       setStatus({ type: "error", message: copy.failure });
@@ -172,7 +168,12 @@ export function ContactForm({ locale }: { locale: Locale }) {
   }
 
   return (
-    <form className="enterprise-form" onSubmit={handleSubmit} noValidate>
+    <form
+      className="enterprise-form"
+      onSubmit={handleSubmit}
+      onFocusCapture={handleFormStart}
+      noValidate
+    >
       <div className="enterprise-form__heading">
         <span>01 / {copy.title}</span>
         <p>{copy.intro}</p>
@@ -201,20 +202,6 @@ export function ContactForm({ locale }: { locale: Locale }) {
         </label>
 
         <label>
-          {copy.email} *
-          <input
-            name="email"
-            type="email"
-            className={fieldClass(Boolean(errors.email))}
-            placeholder={copy.emailPlaceholder}
-            autoComplete="email"
-            aria-invalid={Boolean(errors.email)}
-            aria-describedby={errors.email ? "email-error" : undefined}
-          />
-          {errorFor("email")}
-        </label>
-
-        <label>
           {copy.phone} *
           <input
             name="phone"
@@ -226,31 +213,6 @@ export function ContactForm({ locale }: { locale: Locale }) {
             aria-describedby={errors.phone ? "phone-error" : undefined}
           />
           {errorFor("phone")}
-        </label>
-
-        <label>
-          {copy.company} *
-          <input
-            name="company"
-            className={fieldClass(Boolean(errors.company))}
-            placeholder={copy.companyPlaceholder}
-            autoComplete="organization"
-            aria-invalid={Boolean(errors.company)}
-            aria-describedby={errors.company ? "company-error" : undefined}
-          />
-          {errorFor("company")}
-        </label>
-
-        <label className="enterprise-form__wide">
-          {copy.website}
-          <input
-            name="website"
-            inputMode="url"
-            className={fieldClass(Boolean(errors.website))}
-            placeholder={copy.websitePlaceholder}
-            autoComplete="url"
-          />
-          {errorFor("website")}
         </label>
 
         <label>
@@ -278,6 +240,12 @@ export function ContactForm({ locale }: { locale: Locale }) {
             className={fieldClass(Boolean(errors.budget))}
             aria-invalid={Boolean(errors.budget)}
             aria-describedby={errors.budget ? "budget-error" : undefined}
+            onChange={(event) => {
+              trackMetaEvent("SelectBudget", {
+                content_name: event.currentTarget.value,
+                language: locale,
+              });
+            }}
           >
             <option value="" disabled>{copy.select}</option>
             {copy.budgetOptions.map((option) => (
@@ -286,40 +254,10 @@ export function ContactForm({ locale }: { locale: Locale }) {
           </select>
           {errorFor("budget")}
         </label>
-
-        <label className="enterprise-form__wide">
-          {copy.timeline} *
-          <select
-            name="timeline"
-            defaultValue=""
-            className={fieldClass(Boolean(errors.timeline))}
-            aria-invalid={Boolean(errors.timeline)}
-            aria-describedby={errors.timeline ? "timeline-error" : undefined}
-          >
-            <option value="" disabled>{copy.select}</option>
-            {copy.timelineOptions.map((option) => (
-              <option key={option} value={option}>{option}</option>
-            ))}
-          </select>
-          {errorFor("timeline")}
-        </label>
-
-        <label className="enterprise-form__wide">
-          {copy.challenge} *
-          <textarea
-            name="challenge"
-            rows={6}
-            className={fieldClass(Boolean(errors.challenge))}
-            placeholder={copy.challengePlaceholder}
-            aria-invalid={Boolean(errors.challenge)}
-            aria-describedby={errors.challenge ? "challenge-error" : undefined}
-          />
-          {errorFor("challenge")}
-        </label>
       </div>
 
       <div className="enterprise-consent-field">
-        <input id={`consent-${locale}`} type="checkbox" name="consent" defaultChecked />
+        <input id={`consent-${locale}`} type="checkbox" name="consent" />
         <div>
           <label htmlFor={`consent-${locale}`}>{copy.consent}</label>{" "}
           <Link href={localePrivacy(locale)}>{copy.privacy}</Link>

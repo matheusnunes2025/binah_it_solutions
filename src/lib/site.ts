@@ -1,7 +1,9 @@
 export const contact = {
   phoneDisplay: "(62) 99116-6071",
   whatsappNumber: "5562991166071",
-  email: "binahitsolutions@gmail.com",
+  email:
+    process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() ||
+    "binahitsolutions@gmail.com",
   instagramUrl: "https://www.instagram.com/binah_it_solutions/",
   instagramHandle: "@binah_it_solutions",
 } as const;
@@ -16,7 +18,7 @@ export function whatsappLink(message = defaultWhatsappMessage) {
 export const navItems = [
   { href: "/", label: "Home" },
   { href: "/servicos", label: "Serviços" },
-  { href: "/projetos", label: "Projetos" },
+  { href: "/portfolio", label: "Projetos" },
   { href: "/contato", label: "Contato" },
 ] as const;
 
@@ -89,7 +91,15 @@ export const categoryExamples = [
 
 export const projects = [
   {
-    title: "Sollie Professional",
+    title: "Central do Crédito",
+    description:
+      "Plataforma em Next.js com jornadas específicas de crédito, SEO técnico, consentimento e conversão por WhatsApp.",
+    href: "https://centraldocreditors.com.br/",
+    image: "/images/projeto-central-do-credito.jpg",
+    details: ["Páginas por serviço", "SEO e consentimento", "Jornada de WhatsApp"],
+  },
+  {
+    title: "Solliê Professional",
     description: "Site institucional para apresentar marca, produtos e navegação com clareza.",
     href: "https://www.sollieprofessional.com.br/",
     image: "/images/projeto-sollie.png",

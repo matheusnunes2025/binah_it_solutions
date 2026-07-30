@@ -1,9 +1,5 @@
-import type { Metadata } from "next";
-import { EnterprisePage } from "@/components/enterprise-page";
-import { buildLocalizedHomeMetadata } from "@/lib/seo";
+import { permanentRedirect } from "next/navigation";
 
-export const metadata: Metadata = buildLocalizedHomeMetadata("pt");
-
-export default function PortugueseHomePage() {
-  return <EnterprisePage locale="pt" />;
+export default function LegacyPortugueseHomePage() {
+  permanentRedirect("/");
 }

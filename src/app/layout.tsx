@@ -58,13 +58,13 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     title: siteConfig.defaultTitle,
     description: siteConfig.description,
-    locale: "en_US",
+    locale: "pt_BR",
     images: [
       {
         url: siteConfig.ogImage,
         width: 1600,
         height: 900,
-        alt: "Binah IT Solutions — digital platforms, acquisition and IT infrastructure",
+        alt: "Binah IT Solutions — criação de sites profissionais em Next.js",
       },
     ],
   },
@@ -85,7 +85,7 @@ export default function RootLayout({
 
   return (
     <html
-      lang="en"
+      lang="pt-BR"
       suppressHydrationWarning
       data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}

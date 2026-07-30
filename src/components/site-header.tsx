@@ -10,6 +10,7 @@ import {
   localeConfig,
   localeFromPathname,
   localeHome,
+  localeSwitchHref,
   type Locale,
 } from "@/lib/i18n";
 
@@ -27,7 +28,10 @@ export function SiteHeader() {
   }, [locale]);
 
   const nav = [
-    { href: `${home}#expertise`, label: copy.nav.services },
+    {
+      href: locale === "pt" ? "/criacao-de-sites" : `${home}#expertise`,
+      label: copy.nav.services,
+    },
     { href: `${home}#work`, label: copy.nav.work },
     { href: `${home}#approach`, label: copy.nav.approach },
     { href: `${home}#contact`, label: copy.nav.contact },
@@ -53,7 +57,7 @@ export function SiteHeader() {
             {localeOrder.map((item) => (
               <Link
                 key={item}
-                href={localeHome(item)}
+                href={localeSwitchHref(pathname, item)}
                 hrefLang={localeConfig[item].htmlLang}
                 aria-label={localeConfig[item].name}
                 aria-current={locale === item ? "page" : undefined}
@@ -100,7 +104,7 @@ export function SiteHeader() {
                 {localeOrder.map((item) => (
                   <Link
                     key={item}
-                    href={localeHome(item)}
+                    href={localeSwitchHref(pathname, item)}
                     hrefLang={localeConfig[item].htmlLang}
                     aria-current={locale === item ? "page" : undefined}
                     className={locale === item ? "is-active" : undefined}
