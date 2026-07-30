@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  --font-playfair: var(--font-geist-sans);
   --color-graphite-deep: #1E1E1E;
   --color-graphite-warm: #2D2D2D;
   --color-brown-warm: #5B331A;

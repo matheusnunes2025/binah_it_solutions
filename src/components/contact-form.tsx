@@ -1,45 +1,17 @@
 "use client";
 
-import { FormEvent, useState } from "react";
 import emailjs from "@emailjs/browser";
-import { MailCheck, Send } from "lucide-react";
+import { ArrowUpRight, CircleCheck, Send } from "lucide-react";
+import Link from "next/link";
+import { FormEvent, useState } from "react";
 import { z } from "zod";
+import { trackMetaEvent } from "@/components/meta-pixel";
+import { getCopy, localePrivacy, type Locale } from "@/lib/i18n";
 import { contact } from "@/lib/site";
 
 const EMAILJS_PUBLIC_KEY = "DdIfhPKEGhEx6K8Bg";
 const EMAILJS_SERVICE_ID = "service_ml7818r";
 const EMAILJS_TEMPLATE_ID = "template_r8oi8eh";
-
-const serviceOptions = [
-  { value: "Landing pages", label: "Landing pages" },
-  { value: "Sites profissionais", label: "Sites profissionais" },
-  { value: "Estrutura para buscas", label: "Estrutura para buscas" },
-  { value: "Google Ads", label: "Google Ads" },
-  { value: "Meta Ads", label: "Meta Ads" },
-  {
-    value: "Infraestrutura de TI e redes",
-    label: "Infraestrutura de TI e redes",
-  },
-  {
-    value: "Site, anúncios e infraestrutura",
-    label: "Site, anúncios e infraestrutura",
-  },
-  { value: "Quero entender o melhor caminho", label: "Quero entender o melhor caminho" },
-] as const;
-
-const defaultService = "Site, anúncios e infraestrutura";
-
-const contactSchema = z.object({
-  nome_completo: z.string().trim().min(2, "Informe seu nome completo."),
-  email: z.email("Informe um e-mail válido."),
-  whatsapp: z.string().trim().min(8, "Informe um WhatsApp válido."),
-  empresa: z.string().trim().optional(),
-  servico: z.string().trim().min(2, "Escolha o interesse principal."),
-  sobre_negocio: z.string().trim().min(10, "Conte um pouco sobre o seu negócio."),
-  autorizo_contato: z
-    .boolean()
-    .refine((value) => value, "Autorize o contato para que possamos responder."),
-});
 
 type StatusState = {
   type: "idle" | "success" | "error";
@@ -47,253 +19,329 @@ type StatusState = {
 };
 
 function fieldClass(hasError: boolean) {
-  return `mt-2 w-full rounded-[8px] border bg-[#F8F5ED] px-4 py-3 text-sm text-[#1E1E1E] outline-none transition placeholder:text-stone-400 ${
-    hasError
-      ? "border-red-500 focus:border-red-400"
-      : "border-[#B9A796]/50 focus:border-[#C8A679]"
-  }`;
+  return `enterprise-field ${hasError ? "has-error" : ""}`;
 }
 
-function digitsOnly(value: string) {
-  return value.replace(/\D/g, "");
+function getAttribution() {
+  const parameters = new URLSearchParams(window.location.search);
+  const names = [
+    "utm_source",
+    "utm_medium",
+    "utm_campaign",
+    "utm_content",
+    "utm_term",
+    "fbclid",
+  ];
+
+  return names
+    .map((name) => [name, parameters.get(name)] as const)
+    .filter((entry): entry is readonly [string, string] => Boolean(entry[1]));
 }
 
-export function ContactForm() {
+export function ContactForm({ locale }: { locale: Locale }) {
+  const copy = getCopy(locale).contact.form;
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [status, setStatus] = useState<StatusState>({ type: "idle", message: "" });
   const [loading, setLoading] = useState(false);
 
+  const schema = z.object({
+    full_name: z.string().trim().min(2, copy.errors.name),
+    email: z.string().trim().email(copy.errors.email),
+    phone: z.string().trim().min(7, copy.errors.phone),
+    company: z.string().trim().min(2, copy.errors.company),
+    website: z.string().trim().optional(),
+    service: z.string().trim().min(2, copy.errors.service),
+    budget: z.string().trim().min(2, copy.errors.budget),
+    timeline: z.string().trim().min(2, copy.errors.timeline),
+    challenge: z.string().trim().min(20, copy.errors.challenge),
+    consent: z.boolean().refine(Boolean, copy.errors.consent),
+  });
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formElement = event.currentTarget;
-
     const formData = new FormData(formElement);
+
+    if (String(formData.get("company_fax") || "").trim()) {
+      setStatus({ type: "success", message: copy.success });
+      formElement.reset();
+      return;
+    }
+
     const rawData = {
-      nome_completo: formData.get("nome_completo"),
-      email: formData.get("email"),
-      whatsapp: formData.get("whatsapp"),
-      empresa: formData.get("empresa"),
-      servico: formData.get("servico"),
-      sobre_negocio: formData.get("sobre_negocio"),
-      autorizo_contato: formData.get("autorizo_contato") === "on",
+      full_name: String(formData.get("full_name") || ""),
+      email: String(formData.get("email") || ""),
+      phone: String(formData.get("phone") || ""),
+      company: String(formData.get("company") || ""),
+      website: String(formData.get("website") || ""),
+      service: String(formData.get("service") || ""),
+      budget: String(formData.get("budget") || ""),
+      timeline: String(formData.get("timeline") || ""),
+      challenge: String(formData.get("challenge") || ""),
+      consent: formData.get("consent") === "on",
     };
 
-    const result = contactSchema.safeParse(rawData);
+    const result = schema.safeParse(rawData);
 
     if (!result.success) {
       const nextErrors: Record<string, string> = {};
-
       for (const issue of result.error.issues) {
         const key = issue.path[0];
-
-        if (typeof key === "string" && !nextErrors[key]) {
-          nextErrors[key] = issue.message;
-        }
+        if (typeof key === "string" && !nextErrors[key]) nextErrors[key] = issue.message;
       }
-
       setErrors(nextErrors);
       setStatus({ type: "idle", message: "" });
       return;
     }
 
     setErrors({});
-    setLoading(true);
     setStatus({ type: "idle", message: "" });
+    setLoading(true);
 
     const data = result.data;
-    const whatsappDigits = digitsOnly(data.whatsapp);
-    const normalizedWhatsapp = whatsappDigits.startsWith("55")
-      ? whatsappDigits
-      : `55${whatsappDigits}`;
+    const attribution = getAttribution();
+    const attributionText = attribution.length
+      ? attribution.map(([name, value]) => `${name}: ${value}`).join("\n")
+      : "Direct / unavailable";
+    const submittedAt = new Date().toLocaleString(locale === "pt" ? "pt-BR" : locale === "es" ? "es-ES" : "en-US", {
+      timeZone: "America/Sao_Paulo",
+    });
 
-    const now = new Date();
-    const time = now.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
-
-    const templateParams = {
-      nome_completo: data.nome_completo,
-      email: data.email,
-      whatsapp: data.whatsapp,
-      whatsapp_digits: normalizedWhatsapp,
-      servico: data.servico,
-      sobre_negocio: data.empresa
-        ? `Empresa: ${data.empresa}\n\n${data.sobre_negocio}`
-        : data.sobre_negocio,
-      autorizo_contato: data.autorizo_contato ? "Sim" : "Não",
-      empresa: data.empresa || "-",
-      time,
-      to_email: contact.email,
-      reply_to: data.email,
-    };
+    const context = [
+      `Company: ${data.company}`,
+      `Website: ${data.website || "-"}`,
+      `Service: ${data.service}`,
+      `Budget: ${data.budget}`,
+      `Timeline: ${data.timeline}`,
+      `Language: ${locale}`,
+      "",
+      "Business challenge:",
+      data.challenge,
+      "",
+      "Attribution:",
+      attributionText,
+      `Landing page: ${window.location.href}`,
+    ].join("\n");
 
     try {
-      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams, {
-        publicKey: EMAILJS_PUBLIC_KEY,
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          nome_completo: data.full_name,
+          email: data.email,
+          whatsapp: data.phone,
+          whatsapp_digits: data.phone.replace(/\D/g, ""),
+          empresa: data.company,
+          servico: data.service,
+          faixa_investimento: data.budget,
+          prazo: data.timeline,
+          site_atual: data.website || "-",
+          idioma: locale,
+          sobre_negocio: context,
+          autorizo_contato: data.consent ? "Yes / Sim / Sí" : "No",
+          time: submittedAt,
+          to_email: contact.email,
+          reply_to: data.email,
+        },
+        { publicKey: EMAILJS_PUBLIC_KEY },
+      );
+
+      trackMetaEvent("Lead", {
+        content_category: data.service,
+        content_name: "project-assessment",
+        currency: locale === "pt" ? "BRL" : "USD",
       });
 
-      setStatus({
-        type: "success",
-        message: "Solicitação enviada. A Binah IT retornará com uma orientação inicial.",
-      });
-
+      setStatus({ type: "success", message: copy.success });
       formElement.reset();
-      setErrors({});
     } catch (error) {
       console.error(error);
-      setStatus({
-        type: "error",
-        message:
-          "Não foi possível enviar agora. Você pode chamar diretamente pelo WhatsApp.",
-      });
+      setStatus({ type: "error", message: copy.failure });
     } finally {
       setLoading(false);
     }
   }
 
+  function errorFor(name: string) {
+    return errors[name] ? (
+      <span id={`${name}-error`} className="enterprise-field-error">
+        {errors[name]}
+      </span>
+    ) : null;
+  }
+
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="rounded-[8px] border border-[#B9A796]/45 bg-white p-5 shadow-[var(--shadow-soft)] sm:p-6"
-      noValidate
-    >
-      <div>
-        <p className="eyebrow">Conte seu projeto</p>
-        <h2 className="mt-3 font-serif text-3xl font-semibold leading-tight text-[#1E1E1E]">
-          Contexto ajuda na resposta.
-        </h2>
-        <p className="mt-4 text-sm leading-7 text-[#2D2D2D]">
-          Preencha os dados e retornamos com o próximo passo.
-        </p>
+    <form className="enterprise-form" onSubmit={handleSubmit} noValidate>
+      <div className="enterprise-form__heading">
+        <span>01 / {copy.title}</span>
+        <p>{copy.intro}</p>
       </div>
 
-      <div className="mt-6 grid gap-5 sm:grid-cols-2">
-        <label className="text-sm font-semibold text-[#2D2D2D]">
-          Nome completo
+      <input
+        className="enterprise-honeypot"
+        name="company_fax"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+      />
+
+      <div className="enterprise-form__grid">
+        <label>
+          {copy.name} *
           <input
-            name="nome_completo"
-            className={fieldClass(Boolean(errors.nome_completo))}
-            placeholder="Seu nome"
+            name="full_name"
+            className={fieldClass(Boolean(errors.full_name))}
+            placeholder={copy.namePlaceholder}
             autoComplete="name"
+            aria-invalid={Boolean(errors.full_name)}
+            aria-describedby={errors.full_name ? "full_name-error" : undefined}
           />
-          {errors.nome_completo ? (
-            <span className="mt-2 block text-xs font-medium text-red-600">{errors.nome_completo}</span>
-          ) : null}
+          {errorFor("full_name")}
         </label>
 
-        <label className="text-sm font-semibold text-[#2D2D2D]">
-          E-mail
+        <label>
+          {copy.email} *
           <input
             name="email"
             type="email"
             className={fieldClass(Boolean(errors.email))}
-            placeholder="nome@empresa.com"
+            placeholder={copy.emailPlaceholder}
             autoComplete="email"
+            aria-invalid={Boolean(errors.email)}
+            aria-describedby={errors.email ? "email-error" : undefined}
           />
-          {errors.email ? (
-            <span className="mt-2 block text-xs font-medium text-red-600">{errors.email}</span>
-          ) : null}
+          {errorFor("email")}
         </label>
 
-        <label className="text-sm font-semibold text-[#2D2D2D]">
-          WhatsApp
+        <label>
+          {copy.phone} *
           <input
-            name="whatsapp"
-            className={fieldClass(Boolean(errors.whatsapp))}
-            placeholder="(62) 9 0000-0000"
+            name="phone"
+            type="tel"
+            className={fieldClass(Boolean(errors.phone))}
+            placeholder={copy.phonePlaceholder}
             autoComplete="tel"
+            aria-invalid={Boolean(errors.phone)}
+            aria-describedby={errors.phone ? "phone-error" : undefined}
           />
-          {errors.whatsapp ? (
-            <span className="mt-2 block text-xs font-medium text-red-600">{errors.whatsapp}</span>
-          ) : null}
+          {errorFor("phone")}
         </label>
 
-        <label className="text-sm font-semibold text-[#2D2D2D]">
-          Empresa
+        <label>
+          {copy.company} *
           <input
-            name="empresa"
-            className={fieldClass(Boolean(errors.empresa))}
-            placeholder="Nome da empresa"
+            name="company"
+            className={fieldClass(Boolean(errors.company))}
+            placeholder={copy.companyPlaceholder}
             autoComplete="organization"
+            aria-invalid={Boolean(errors.company)}
+            aria-describedby={errors.company ? "company-error" : undefined}
           />
-          {errors.empresa ? (
-            <span className="mt-2 block text-xs font-medium text-red-600">{errors.empresa}</span>
-          ) : null}
+          {errorFor("company")}
         </label>
 
-        <label className="text-sm font-semibold text-[#2D2D2D] sm:col-span-2">
-          Interesse principal
+        <label className="enterprise-form__wide">
+          {copy.website}
+          <input
+            name="website"
+            inputMode="url"
+            className={fieldClass(Boolean(errors.website))}
+            placeholder={copy.websitePlaceholder}
+            autoComplete="url"
+          />
+          {errorFor("website")}
+        </label>
+
+        <label>
+          {copy.service} *
           <select
-            name="servico"
-            defaultValue={defaultService}
-            className={fieldClass(Boolean(errors.servico))}
+            name="service"
+            defaultValue=""
+            className={fieldClass(Boolean(errors.service))}
+            aria-invalid={Boolean(errors.service)}
+            aria-describedby={errors.service ? "service-error" : undefined}
           >
-            {serviceOptions.map((option) => (
-              <option key={option.value} className="bg-white text-[#1E1E1E]" value={option.value}>
-                {option.label}
-              </option>
+            <option value="" disabled>{copy.select}</option>
+            {copy.serviceOptions.map((option) => (
+              <option key={option} value={option}>{option}</option>
             ))}
           </select>
-          {errors.servico ? (
-            <span className="mt-2 block text-xs font-medium text-red-600">{errors.servico}</span>
-          ) : null}
+          {errorFor("service")}
+        </label>
+
+        <label>
+          {copy.budget} *
+          <select
+            name="budget"
+            defaultValue=""
+            className={fieldClass(Boolean(errors.budget))}
+            aria-invalid={Boolean(errors.budget)}
+            aria-describedby={errors.budget ? "budget-error" : undefined}
+          >
+            <option value="" disabled>{copy.select}</option>
+            {copy.budgetOptions.map((option) => (
+              <option key={option} value={option}>{option}</option>
+            ))}
+          </select>
+          {errorFor("budget")}
+        </label>
+
+        <label className="enterprise-form__wide">
+          {copy.timeline} *
+          <select
+            name="timeline"
+            defaultValue=""
+            className={fieldClass(Boolean(errors.timeline))}
+            aria-invalid={Boolean(errors.timeline)}
+            aria-describedby={errors.timeline ? "timeline-error" : undefined}
+          >
+            <option value="" disabled>{copy.select}</option>
+            {copy.timelineOptions.map((option) => (
+              <option key={option} value={option}>{option}</option>
+            ))}
+          </select>
+          {errorFor("timeline")}
+        </label>
+
+        <label className="enterprise-form__wide">
+          {copy.challenge} *
+          <textarea
+            name="challenge"
+            rows={6}
+            className={fieldClass(Boolean(errors.challenge))}
+            placeholder={copy.challengePlaceholder}
+            aria-invalid={Boolean(errors.challenge)}
+            aria-describedby={errors.challenge ? "challenge-error" : undefined}
+          />
+          {errorFor("challenge")}
         </label>
       </div>
 
-      <label className="mt-5 block text-sm font-semibold text-[#2D2D2D]">
-        Sobre o negócio
-        <textarea
-          name="sobre_negocio"
-          rows={5}
-          className={fieldClass(Boolean(errors.sobre_negocio))}
-          placeholder="O que sua empresa faz e o que você precisa melhorar?"
-        />
-        {errors.sobre_negocio ? (
-          <span className="mt-2 block text-xs font-medium text-red-600">{errors.sobre_negocio}</span>
-        ) : null}
-      </label>
-
-      <label className="mt-5 flex items-start gap-3 rounded-[8px] border border-[#B9A796]/40 bg-[#F8F5ED] px-4 py-3 text-sm text-[#2D2D2D]">
-        <input
-          type="checkbox"
-          name="autorizo_contato"
-          defaultChecked
-          className="mt-1 size-4 rounded border-[#B9A796] accent-[#C8A679]"
-        />
-        <span>Autorizo contato por e-mail ou WhatsApp para retorno sobre minha solicitação.</span>
-      </label>
-      {errors.autorizo_contato ? (
-        <span className="mt-2 block text-xs font-medium text-red-600">
-          {errors.autorizo_contato}
-        </span>
-      ) : null}
+      <div className="enterprise-consent-field">
+        <input id={`consent-${locale}`} type="checkbox" name="consent" defaultChecked />
+        <div>
+          <label htmlFor={`consent-${locale}`}>{copy.consent}</label>{" "}
+          <Link href={localePrivacy(locale)}>{copy.privacy}</Link>
+          {errorFor("consent")}
+        </div>
+      </div>
 
       {status.type !== "idle" ? (
-        <div
-          className={`mt-5 rounded-[8px] border px-4 py-3 text-sm leading-6 ${
-            status.type === "success"
-              ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-              : "border-red-200 bg-red-50 text-red-800"
-          }`}
-        >
-          <div className="flex items-start gap-2">
-            {status.type === "success" ? <MailCheck size={18} /> : <Send size={18} />}
-            <span>{status.message}</span>
-          </div>
+        <div className={`enterprise-form-status is-${status.type}`} role="status">
+          {status.type === "success" ? <CircleCheck size={19} /> : <Send size={19} />}
+          <span>{status.message}</span>
         </div>
       ) : null}
 
-      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <button
-          type="submit"
-          disabled={loading}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-[8px] bg-[#C8A679] px-5 py-3.5 text-sm font-semibold text-[#180d07] transition hover:bg-[#5B331A] hover:text-[#F8F5ED] disabled:cursor-not-allowed disabled:opacity-80 sm:w-auto"
-        >
-          <Send size={18} />
-          {loading ? "Enviando..." : "Enviar solicitação"}
-        </button>
-        <p className="text-sm leading-6 text-stone-600">
-          Também é possível chamar direto pelo WhatsApp.
-        </p>
-      </div>
+      <button
+        type="submit"
+        className="enterprise-submit"
+        disabled={loading}
+      >
+        <span>{loading ? copy.submitting : copy.submit}</span>
+        <ArrowUpRight size={19} />
+      </button>
     </form>
   );
 }

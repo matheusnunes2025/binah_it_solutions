@@ -175,7 +175,7 @@ export default function ContactPage() {
           </aside>
 
           <div id="formulario" className="scroll-mt-28">
-            <ContactForm />
+            <ContactForm locale="pt" />
           </div>
         </div>
       </section>

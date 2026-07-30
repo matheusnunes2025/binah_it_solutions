@@ -1,100 +1,83 @@
-import { Mail } from "lucide-react";
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { ArrowUpRight, Mail } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { SocialIcon } from "@/components/social-icon";
-import { contact, navItems, whatsappLink } from "@/lib/site";
+import {
+  getCopy,
+  localeFromPathname,
+  localeHome,
+  localePrivacy,
+} from "@/lib/i18n";
+import { contact, whatsappLink } from "@/lib/site";
 
 export function SiteFooter() {
+  const locale = localeFromPathname(usePathname());
+  const copy = getCopy(locale);
+  const home = localeHome(locale);
+  const year = new Date().getFullYear();
+
+  const nav = [
+    { href: `${home}#expertise`, label: copy.nav.services },
+    { href: `${home}#work`, label: copy.nav.work },
+    { href: `${home}#approach`, label: copy.nav.approach },
+    { href: `${home}#contact`, label: copy.nav.contact },
+  ];
+
   return (
-    <footer className="border-t border-[#B9A796]/35 bg-[#EFE7DA]">
-      <div className="site-container grid gap-10 py-12 md:grid-cols-[1.2fr_0.8fr_1fr]">
-        <div>
-          <BrandLogo size="md" lightBg />
-          <p className="mt-5 max-w-sm text-sm leading-7 text-[#2D2D2D]">
-            Sites, anúncios e infraestrutura para empresas.
-          </p>
-        </div>
-
-        <div className="grid gap-8 sm:grid-cols-2">
-          <div>
-            <p className="text-sm font-semibold uppercase text-[#5B331A]">Páginas</p>
-            <div className="mt-4 flex flex-col gap-3">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="text-sm text-[#2D2D2D] transition hover:text-[#5B331A]"
-                >
-                  {item.label}
-                </Link>
-              ))}
-              <Link
-                href="/politica-de-privacidade"
-                className="text-sm text-[#2D2D2D] transition hover:text-[#5B331A]"
-              >
-                Política de Privacidade
-              </Link>
-            </div>
-          </div>
-
-          <div>
-            <p className="text-sm font-semibold uppercase text-[#5B331A]">Segmentos</p>
-            <div className="mt-4 flex flex-col gap-3">
-              <Link
-                href="/sites-para-nutricionistas"
-                className="text-sm text-[#2D2D2D] transition hover:text-[#5B331A]"
-              >
-                Sites para nutricionistas
-              </Link>
-              <Link
-                href="/infraestrutura-de-ti-para-empresas"
-                className="text-sm text-[#2D2D2D] transition hover:text-[#5B331A]"
-              >
-                Infraestrutura de TI
-              </Link>
-              <Link
-                href="/sites-para-engenharia-arquitetura-construtoras"
-                className="text-sm text-[#2D2D2D] transition hover:text-[#5B331A]"
-              >
-                Engenharia e arquitetura
-              </Link>
-            </div>
-          </div>
+    <footer className="enterprise-footer">
+      <div className="enterprise-shell enterprise-footer__grid">
+        <div className="enterprise-footer__brand">
+          <Link href={home} aria-label="Binah IT Solutions">
+            <BrandLogo size="md" />
+          </Link>
+          <p>{copy.footer.line}</p>
         </div>
 
         <div>
-          <p className="text-sm font-semibold uppercase text-[#5B331A]">Contato</p>
-          <div className="mt-4 flex flex-col gap-3">
+          <p className="enterprise-footer__label">{copy.footer.navigation}</p>
+          <nav className="enterprise-footer__links">
+            {nav.map((item) => (
+              <Link key={item.href} href={item.href}>
+                {item.label}
+              </Link>
+            ))}
+            <Link href={localePrivacy(locale)}>{copy.footer.privacy}</Link>
+          </nav>
+        </div>
+
+        <div>
+          <p className="enterprise-footer__label">{copy.footer.contact}</p>
+          <div className="enterprise-footer__links enterprise-footer__links--contact">
+            <a href={`mailto:${contact.email}`}>
+              <Mail size={16} />
+              {contact.email}
+            </a>
             <a
               href={whatsappLink()}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-[#2D2D2D] transition hover:text-[#5B331A]"
+              data-track="footer-whatsapp"
+              data-meta-event="Contact"
             >
-              <SocialIcon type="whatsapp" size={19} label="WhatsApp da Binah IT Solutions" />
+              <SocialIcon type="whatsapp" size={17} label="WhatsApp" />
               {contact.phoneDisplay}
             </a>
-            <a
-              href={contact.instagramUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-[#2D2D2D] transition hover:text-[#5B331A]"
-            >
-              <SocialIcon type="instagram" size={19} label="Instagram da Binah IT Solutions" />
+            <a href={contact.instagramUrl} target="_blank" rel="noreferrer">
+              <SocialIcon type="instagram" size={17} label="Instagram" />
               {contact.instagramHandle}
-            </a>
-            <a
-              href={`mailto:${contact.email}`}
-              className="inline-flex items-center gap-2 text-sm text-[#2D2D2D] transition hover:text-[#5B331A]"
-            >
-              <Mail size={18} />
-              {contact.email}
             </a>
           </div>
         </div>
       </div>
-      <div className="border-t border-[#B9A796]/35 px-5 py-5 text-center text-xs text-[#5B331A]">
-        Binah IT Solutions — tecnologia para empresas.
+
+      <div className="enterprise-shell enterprise-footer__bottom">
+        <span>© {year} {copy.footer.rights}</span>
+        <a href="#top">
+          Top <ArrowUpRight size={14} />
+        </a>
       </div>
     </footer>
   );

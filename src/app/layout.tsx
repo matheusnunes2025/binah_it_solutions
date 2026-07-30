@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import { buildBaseJsonLd, serializeJsonLd, siteConfig } from "@/lib/seo";
+import { MetaPixel } from "@/components/meta-pixel";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
+import "./enterprise.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,12 +15,6 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
-});
-
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
-  subsets: ["latin"],
-  weight: ["600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -62,13 +58,13 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     title: siteConfig.defaultTitle,
     description: siteConfig.description,
-    locale: "pt_BR",
+    locale: "en_US",
     images: [
       {
         url: siteConfig.ogImage,
         width: 1600,
         height: 900,
-        alt: "Binah IT Solutions - sites, anúncios e infraestrutura de TI para empresas",
+        alt: "Binah IT Solutions — digital platforms, acquisition and IT infrastructure",
       },
     ],
   },
@@ -89,9 +85,10 @@ export default function RootLayout({
 
   return (
     <html
-      lang="pt-BR"
+      lang="en"
+      suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-brand-bg text-foreground">
         <script
@@ -101,6 +98,7 @@ export default function RootLayout({
         <SiteHeader />
         <main>{children}</main>
         <SiteFooter />
+        <MetaPixel />
       </body>
     </html>
   );
