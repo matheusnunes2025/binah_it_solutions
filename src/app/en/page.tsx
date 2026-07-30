@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { EnterprisePage } from "@/components/enterprise-page";
 import { buildLocalizedHomeMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = buildLocalizedHomeMetadata("pt");
+export const metadata: Metadata = buildLocalizedHomeMetadata("en");
 
-export default function HomePage() {
-  return <EnterprisePage locale="pt" />;
+export default function EnglishHomePage() {
+  return <EnterprisePage locale="en" />;
 }

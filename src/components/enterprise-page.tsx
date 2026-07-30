@@ -15,7 +15,13 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { ContactForm } from "@/components/contact-form";
-import { getCopy, localeConfig, localeHome, type Locale } from "@/lib/i18n";
+import {
+  getCopy,
+  localeCaseStudy,
+  localeConfig,
+  localeHome,
+  type Locale,
+} from "@/lib/i18n";
 import { absoluteUrl, serializeJsonLd } from "@/lib/seo";
 import { whatsappLink } from "@/lib/site";
 
@@ -31,6 +37,7 @@ const whatsappMessages: Record<Locale, string> = {
 export function EnterprisePage({ locale }: { locale: Locale }) {
   const copy = getCopy(locale);
   const home = localeHome(locale);
+  const featuredCaseHref = localeCaseStudy(locale, "central-do-credito");
 
   const pageJsonLd = {
     "@context": "https://schema.org",
@@ -101,40 +108,58 @@ export function EnterprisePage({ locale }: { locale: Locale }) {
             </p>
           </div>
 
-          <div className="system-console" aria-label={copy.hero.panelTitle}>
-            <div className="system-console__topbar">
+          <article className="hero-project" aria-label={copy.hero.panelTitle}>
+            <div className="hero-project__topbar">
               <span>{copy.hero.panelLabel}</span>
-              <span className="system-console__status">
+              <span className="hero-project__status">
                 <i />
                 {copy.hero.panelStatus}
               </span>
             </div>
-            <div className="system-console__body">
-              <div className="system-console__heading">
-                <span>BINAH / 01</span>
-                <h2>{copy.hero.panelTitle}</h2>
+            <Link
+              href={featuredCaseHref}
+              className="hero-project__image"
+              data-track="hero-case-study"
+              data-meta-event="ViewContent"
+            >
+              <Image
+                src="/images/projeto-central-do-credito.jpg"
+                alt={`${copy.hero.panelTitle} — ${copy.hero.panelLabel}`}
+                fill
+                priority
+                sizes="(min-width: 1100px) 44vw, 92vw"
+              />
+              <span className="hero-project__index">CASE / 01</span>
+            </Link>
+            <div className="hero-project__body">
+              <div className="hero-project__heading">
+                <div>
+                  <small>BINAH / WORK</small>
+                  <h2>{copy.hero.panelTitle}</h2>
+                </div>
+                <Link
+                  href={featuredCaseHref}
+                  aria-label={`${copy.work.case}: ${copy.hero.panelTitle}`}
+                  data-track="hero-case-study"
+                  data-meta-event="ViewContent"
+                >
+                  <ArrowUpRight size={19} />
+                </Link>
               </div>
-              <div className="system-console__nodes">
-                {copy.hero.panelItems.map((item, index) => {
-                  const Icon = serviceIcons[index];
-                  return (
-                    <div className="system-node" key={item.label}>
-                      <span className="system-node__icon"><Icon size={19} /></span>
-                      <span>
-                        <small>{item.label}</small>
-                        <strong>{item.value}</strong>
-                      </span>
-                      <CircleCheck size={17} />
-                    </div>
-                  );
-                })}
+              <div className="hero-project__proof">
+                {copy.hero.panelItems.map((item) => (
+                  <span key={item.label}>
+                    <small>{item.label}</small>
+                    <strong>{item.value}</strong>
+                  </span>
+                ))}
               </div>
             </div>
-            <div className="system-console__footer">
+            <div className="hero-project__footer">
               <span>{copy.hero.panelFooter}</span>
-              <span className="system-console__pulse" aria-hidden="true" />
+              <span className="hero-project__pulse" aria-hidden="true" />
             </div>
-          </div>
+          </article>
         </div>
       </section>
 
@@ -183,6 +208,12 @@ export function EnterprisePage({ locale }: { locale: Locale }) {
               );
             })}
           </div>
+          {locale === "pt" ? (
+            <Link href="/criacao-de-sites" className="service-page-link">
+              Ver escopo, valores e entregáveis de criação de sites
+              <ArrowUpRight size={18} />
+            </Link>
+          ) : null}
         </div>
       </section>
 
@@ -201,28 +232,33 @@ export function EnterprisePage({ locale }: { locale: Locale }) {
 
           <div className="work-grid">
             {copy.work.projects.map((project, index) => (
-              <article className="work-card" key={project.title}>
-                <a
-                  href={project.href}
-                  target="_blank"
-                  rel="noreferrer"
+              <article className={`work-card ${index === 0 ? "work-card--featured" : ""}`} key={project.title}>
+                <Link
+                  href={localeCaseStudy(locale, project.slug)}
                   className="work-card__image"
-                  aria-label={`${copy.work.view}: ${project.title}`}
+                  aria-label={`${copy.work.case}: ${project.title}`}
+                  data-track={`case-study-${project.slug}`}
+                  data-meta-event="ViewContent"
                 >
                   <Image
                     src={project.image}
                     alt={`${project.title} website project`}
                     fill
-                    sizes="(min-width: 1000px) 50vw, 100vw"
+                    sizes={index === 0 ? "(min-width: 1000px) 55vw, 100vw" : "(min-width: 1000px) 50vw, 100vw"}
                   />
                   <span>0{index + 1}</span>
-                </a>
+                </Link>
                 <div className="work-card__content">
                   <div className="work-card__meta">
                     <span>{project.sector}</span>
-                    <a href={project.href} target="_blank" rel="noreferrer">
-                      {copy.work.view}<ExternalLink size={15} />
-                    </a>
+                    <div className="work-card__links">
+                      <Link href={localeCaseStudy(locale, project.slug)}>
+                        {copy.work.case}<ArrowUpRight size={15} />
+                      </Link>
+                      <a href={project.href} target="_blank" rel="noreferrer">
+                        {copy.work.view}<ExternalLink size={15} />
+                      </a>
+                    </div>
                   </div>
                   <h3>{project.title}</h3>
                   <p>{project.summary}</p>
@@ -317,6 +353,7 @@ export function EnterprisePage({ locale }: { locale: Locale }) {
                   {'featured' in item && item.featured ? <span className="engagement-marker">BINAH / CORE</span> : null}
                 </div>
                 <h3>{item.title}</h3>
+                <strong className="engagement-price">{item.price}</strong>
                 <small>{copy.engagements.bestFor}: {item.subtitle}</small>
                 <p>{item.text}</p>
                 <ul>
@@ -381,6 +418,25 @@ export function EnterprisePage({ locale }: { locale: Locale }) {
           <ContactForm locale={locale} />
         </div>
       </section>
+
+      <nav className="mobile-conversion-bar" aria-label={copy.contact.title}>
+        <a
+          href={whatsappLink(whatsappMessages[locale])}
+          target="_blank"
+          rel="noreferrer"
+          data-track="mobile-sticky-whatsapp"
+          data-meta-event="Contact"
+        >
+          {copy.contact.whatsapp}
+        </a>
+        <Link
+          href="#contact"
+          data-track="mobile-sticky-proposal"
+          data-meta-event="Contact"
+        >
+          {copy.hero.primaryCta}
+        </Link>
+      </nav>
     </div>
   );
 }

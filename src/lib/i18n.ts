@@ -1,15 +1,17 @@
+import { contact } from "@/lib/site";
+
 export type Locale = "en" | "pt" | "es";
 
 export const localeConfig = {
   en: {
-    href: "/",
+    href: "/en",
     htmlLang: "en",
     label: "EN",
     name: "English",
     ogLocale: "en_US",
   },
   pt: {
-    href: "/pt-br",
+    href: "/",
     htmlLang: "pt-BR",
     label: "PT",
     name: "Português",
@@ -29,51 +31,92 @@ export function localeHome(locale: Locale) {
 }
 
 export function localePrivacy(locale: Locale) {
-  if (locale === "pt") return "/pt-br/privacidade";
+  if (locale === "pt") return "/privacidade";
   if (locale === "es") return "/es/privacidad";
-  return "/privacy";
+  return "/en/privacy";
 }
 
 export function localeFromPathname(pathname: string): Locale {
-  if (pathname === "/pt-br" || pathname.startsWith("/pt-br/")) return "pt";
+  if (pathname === "/en" || pathname.startsWith("/en/")) return "en";
   if (pathname === "/es" || pathname.startsWith("/es/")) return "es";
-
-  const legacyPortuguesePaths = [
-    "/contato",
-    "/projetos",
-    "/servicos",
-    "/infraestrutura-de-ti-para-empresas",
-    "/sites-para-nutricionistas",
-    "/sites-para-engenharia-arquitetura-construtoras",
-    "/politica-de-privacidade",
-  ];
-
-  return legacyPortuguesePaths.some((path) => pathname.startsWith(path)) ? "pt" : "en";
+  return "pt";
 }
 
 const sharedProjects = [
   {
-    title: "Sollie Professional",
+    slug: "central-do-credito",
+    title: "Central do Crédito",
+    href: "https://centraldocreditors.com.br/",
+    image: "/images/projeto-central-do-credito.jpg",
+  },
+  {
+    slug: "sollie-professional",
+    title: "Solliê Professional",
     href: "https://www.sollieprofessional.com.br/",
     image: "/images/projeto-sollie.png",
   },
   {
+    slug: "strauss-impermeabilizacao",
     title: "Strauss Impermeabilização",
     href: "https://straussimpermeabilizacao.com.br/",
     image: "/images/projeto-strauss.png",
   },
 ] as const;
 
+export function localePortfolio(locale: Locale) {
+  if (locale === "en") return "/en/work";
+  if (locale === "es") return "/es/proyectos";
+  return "/portfolio";
+}
+
+export function localeCaseStudy(locale: Locale, slug: string) {
+  return `${localePortfolio(locale)}/${slug}`;
+}
+
+export function localeSwitchHref(pathname: string, locale: Locale) {
+  const normalizedPath = pathname.replace(/\/+$/, "") || "/";
+
+  if (
+    ["/privacidade", "/politica-de-privacidade", "/pt-br/privacidade", "/en/privacy", "/privacy", "/es/privacidad"].includes(
+      normalizedPath,
+    )
+  ) {
+    return localePrivacy(locale);
+  }
+
+  if (
+    ["/portfolio", "/projetos", "/en/work", "/es/proyectos"].includes(
+      normalizedPath,
+    )
+  ) {
+    return localePortfolio(locale);
+  }
+
+  const caseMatch = normalizedPath.match(
+    /^\/(?:portfolio|projetos|en\/work|es\/proyectos)\/([^/]+)$/,
+  );
+
+  if (caseMatch) {
+    return localeCaseStudy(locale, caseMatch[1]);
+  }
+
+  if (normalizedPath === "/criacao-de-sites") {
+    return locale === "pt" ? normalizedPath : `${localeHome(locale)}#expertise`;
+  }
+
+  return localeHome(locale);
+}
+
 export const copyByLocale = {
   en: {
     metadata: {
-      title: "Binah IT Solutions | Digital systems for ambitious companies",
+      title: "Professional Website Development | Binah IT Solutions",
       description:
-        "Binah IT designs corporate websites, acquisition systems and IT infrastructure for companies ready to scale with clarity.",
+        "Professional Next.js websites built for trust, qualified leads, Google visibility and paid campaigns. Projects from R$2,490.",
     },
     nav: {
       label: "Primary navigation",
-      services: "Expertise",
+      services: "Websites",
       work: "Work",
       approach: "Approach",
       contact: "Contact",
@@ -83,81 +126,89 @@ export const copyByLocale = {
       languages: "Language",
     },
     hero: {
-      eyebrow: "Independent technology partner",
-      title: "Systems built to make ambitious companies",
-      accent: "move faster.",
+      eyebrow: "Professional websites • Next.js • SEO",
+      title: "Professional websites for companies ready to",
+      accent: "generate more opportunities.",
       description:
-        "We design and build high-performance digital platforms, acquisition systems and IT foundations for companies that have outgrown improvisation.",
-      primaryCta: "Request a strategic assessment",
-      secondaryCta: "View selected work",
-      note: "Every engagement starts with technical and commercial alignment.",
-      panelLabel: "Binah delivery system",
-      panelStatus: "Operational",
-      panelTitle: "One strategy. Three connected systems.",
+        "Fast, responsive websites prepared for Google, Meta Ads, Google Ads and WhatsApp—from positioning through launch, without generic templates.",
+      primaryCta: "Request a proposal",
+      secondaryCta: "View real projects",
+      note: "Projects from R$2,490. Scope and schedule are confirmed before work begins.",
+      panelLabel: "Live project",
+      panelStatus: "Published",
+      panelTitle: "Central do Crédito",
       panelItems: [
-        { label: "Digital platform", value: "Position + convert" },
-        { label: "Demand system", value: "Attract + measure" },
-        { label: "IT foundation", value: "Operate + scale" },
+        { label: "Architecture", value: "Service journeys" },
+        { label: "Acquisition", value: "SEO + WhatsApp" },
+        { label: "Engineering", value: "Next.js" },
       ],
-      panelFooter: "Strategy → Build → Validate → Improve",
+      panelFooter: "Real work. Verifiable scope. No invented metrics.",
     },
     trust: {
-      lead: "One accountable partner from diagnosis to launch.",
-      items: ["Strategy", "Experience design", "Engineering", "Acquisition", "Infrastructure"],
+      lead: "Concrete deliverables from strategy to launch.",
+      items: ["Next.js", "Responsive design", "Technical SEO", "Analytics", "WhatsApp"],
     },
     services: {
-      eyebrow: "What we build",
-      title: "One partner across the systems your growth depends on.",
+      eyebrow: "Core expertise",
+      title: "Website first. Acquisition and technology expand the result.",
       description:
-        "Not disconnected deliverables. A coherent commercial and technical foundation, designed around the next business outcome.",
+        "The main offer is professional website development. SEO, paid media and IT infrastructure are added only when the business case requires them.",
       items: [
         {
           number: "01",
-          title: "Corporate platforms",
+          title: "Professional websites",
           description:
-            "Websites and landing environments that help complex buyers understand, trust and act.",
-          result: "A digital presence equal to your commercial ambition.",
-          deliverables: ["Positioning & UX", "Next.js engineering", "SEO & measurement"],
+            "Corporate websites and landing pages that explain the offer, build trust and move visitors toward contact.",
+          result: "A fast, maintainable commercial asset ready for campaigns.",
+          deliverables: ["Positioning & UX", "Next.js development", "Technical SEO"],
         },
         {
           number: "02",
-          title: "Acquisition systems",
+          title: "Acquisition & measurement",
           description:
-            "Meta and Google campaigns connected to focused pages, clean tracking and a qualified lead journey.",
-          result: "Demand generation that can be read and improved.",
-          deliverables: ["Offer & funnel", "Campaign structure", "Conversion tracking"],
+            "Meta and Google campaigns connected to focused landing pages, clean tracking and a qualified lead journey.",
+          result: "Traffic and conversion data the company can actually use.",
+          deliverables: ["Landing pages", "Meta / Google Ads", "Conversion tracking"],
         },
         {
           number: "03",
-          title: "IT foundations",
+          title: "Business IT infrastructure",
           description:
-            "Networks, business Wi-Fi and technical organization for teams that need dependable operations.",
-          result: "Less operational friction and fewer improvised fixes.",
+            "A separate specialist track for networks, business Wi-Fi and technical organization.",
+          result: "Dependable operations without competing with the website offer.",
           deliverables: ["Technical diagnosis", "Network architecture", "Documentation"],
         },
       ],
     },
     work: {
-      eyebrow: "Selected work",
-      title: "Work with a clear job to do.",
+      eyebrow: "Verified case studies",
+      title: "Real projects, explained beyond the screenshot.",
       description:
-        "We show the scope we can verify—never invented metrics. Each project is designed around a concrete commercial function.",
-      view: "Visit live project",
-      focusLabel: "Project focus",
+        "Each case shows the commercial challenge, information architecture, implementation and evidence that can be checked on the live website.",
+      view: "Visit live website",
+      case: "View case study",
+      focusLabel: "Verified scope",
       projects: [
         {
           ...sharedProjects[0],
-          sector: "Professional beauty",
+          sector: "Financial services",
           summary:
-            "A corporate product experience that gives the brand, catalog and commercial pathways a clearer digital structure.",
-          focus: ["Brand hierarchy", "Responsive catalog", "Commercial navigation"],
+            "A Next.js acquisition platform that organizes four credit journeys, trust signals, privacy choices and direct WhatsApp conversion.",
+          focus: ["Dedicated service pages", "SEO & consent", "WhatsApp journey"],
         },
         {
           ...sharedProjects[1],
-          sector: "Engineering & construction",
+          sector: "Professional beauty",
           summary:
-            "A technical service platform built to explain complex work and move qualified prospects toward a quote.",
-          focus: ["Service clarity", "Technical credibility", "Quote journey"],
+            "A product-rich brand experience connecting launches, hair needs, purchasing locations, distributors, events and education.",
+          focus: ["Product taxonomy", "Brand experience", "Distributor journey"],
+        },
+        {
+          ...sharedProjects[2],
+          sector: "Construction services",
+          summary:
+            "A local service platform combining technical scope, project gallery, customer reviews and a direct quote path.",
+          focus: ["Local SEO", "Service proof", "Quote journey"],
         },
       ],
     },
@@ -214,30 +265,40 @@ export const copyByLocale = {
       ],
     },
     engagements: {
-      eyebrow: "Engagement models",
-      title: "Scoped to the decision—not padded with deliverables.",
+      eyebrow: "Clear starting points",
+      title: "An offer ladder for different stages of growth.",
       description:
-        "We choose the smallest engagement capable of solving the real problem and supporting the next stage of growth.",
+        "Start with the smallest scope that solves the immediate problem, while preserving a path to campaigns, integrations and custom systems.",
       bestFor: "Best for",
       items: [
         {
-          title: "Focused build",
-          subtitle: "One urgent commercial outcome",
-          text: "A defined platform, landing environment or technical intervention with a clear launch condition.",
-          points: ["Defined scope", "Single accountable outcome", "Launch-ready delivery"],
+          title: "Strategic landing page",
+          price: "From R$2,490",
+          subtitle: "One offer or campaign",
+          text: "A focused conversion page for a specific service, product or paid-media campaign.",
+          points: ["Responsive page", "Technical SEO", "WhatsApp or form"],
         },
         {
-          title: "Growth system",
-          subtitle: "Platform + acquisition + measurement",
-          text: "A connected foundation for companies that need to improve positioning and generate qualified demand.",
-          points: ["Multi-workstream scope", "Campaign readiness", "Measurement foundation"],
+          title: "Professional corporate site",
+          price: "From R$3,900",
+          subtitle: "Company, services and authority",
+          text: "A complete institutional presence for companies that need to present services and generate qualified contacts.",
+          points: ["Strategic pages", "Responsive design", "Search foundation"],
+        },
+        {
+          title: "Growth platform",
+          price: "From R$5,900",
+          subtitle: "Website + acquisition + measurement",
+          text: "A connected foundation for positioning, paid campaigns and conversion measurement.",
+          points: ["Campaign-ready pages", "Analytics foundation", "Conversion events"],
           featured: true,
         },
         {
-          title: "Custom program",
-          subtitle: "Complex or phased transformation",
-          text: "For infrastructure, multi-site or cross-functional projects that require discovery and staged delivery.",
-          points: ["Discovery phase", "Phased roadmap", "Custom governance"],
+          title: "Custom system",
+          price: "From R$10k",
+          subtitle: "Complex or phased requirements",
+          text: "For multilingual sites, automations, integrations, portals and custom business workflows.",
+          points: ["Discovery phase", "Custom architecture", "Phased roadmap"],
         },
       ],
     },
@@ -248,7 +309,7 @@ export const copyByLocale = {
         {
           question: "What investment level is a good fit?",
           answer:
-            "The qualification form starts at US$5k. Final investment depends on scope, risk and number of workstreams; we only quote after understanding the business problem.",
+            "A strategic landing page starts at R$2,490, corporate websites at R$3,900, growth platforms at R$5,900 and custom systems at R$10k. Final pricing follows a confirmed scope.",
         },
         {
           question: "Can Binah manage Meta and Google campaigns?",
@@ -273,10 +334,10 @@ export const copyByLocale = {
       ],
     },
     contact: {
-      eyebrow: "Start with context",
-      title: "Bring the business problem. We will define the right system.",
+      eyebrow: "Quick qualification",
+      title: "Find the right website for your budget.",
       description:
-        "Share the outcome, constraint and current situation. You will receive a direct response about fit and the next step.",
+        "Send four initial details. We use WhatsApp to understand the remaining context without turning the first contact into an interview.",
       promiseTitle: "What happens next",
       promiseItems: [
         "We review commercial and technical fit.",
@@ -286,8 +347,8 @@ export const copyByLocale = {
       direct: "Prefer a direct conversation?",
       whatsapp: "Open WhatsApp",
       form: {
-        title: "Project assessment",
-        intro: "Fields marked with * are required.",
+        title: "Request a proposal",
+        intro: "Four quick fields. Detailed scoping happens in the next conversation.",
         name: "Full name",
         namePlaceholder: "Your name",
         email: "Work email",
@@ -306,18 +367,18 @@ export const copyByLocale = {
           "What needs to change, why now, and what would a successful outcome look like?",
         consent:
           "I authorize Binah IT Solutions to contact me about this request and agree to the privacy notice.",
-        submit: "Request assessment",
+        submit: "Request proposal",
         submitting: "Sending...",
         privacy: "Privacy notice",
         serviceOptions: [
-          "Corporate website or platform",
-          "Landing pages and acquisition",
+          "Strategic landing page",
+          "Professional corporate website",
+          "Growth platform",
+          "Custom website or system",
           "Meta / Google Ads",
           "IT infrastructure and networks",
-          "Connected growth system",
-          "I need help defining the scope",
         ],
-        budgetOptions: ["US$5k–10k", "US$10k–25k", "US$25k+", "Scope it with me"],
+        budgetOptions: ["R$2.4k–3.9k", "R$3.9k–5.9k", "R$5.9k–10k", "R$10k+"],
         timelineOptions: ["As soon as scope is clear", "Within 1–2 months", "Within 3–6 months", "Planning ahead"],
         select: "Select an option",
         errors: {
@@ -332,7 +393,7 @@ export const copyByLocale = {
           consent: "Authorization is required so we can respond.",
         },
         success:
-          "Assessment request sent. We will review the context and reply with the next step.",
+          "Request sent. We will review your project type and budget, then reply on WhatsApp.",
         failure:
           "The form could not be sent right now. Please contact us directly on WhatsApp.",
       },
@@ -353,13 +414,13 @@ export const copyByLocale = {
   },
   pt: {
     metadata: {
-      title: "Binah IT Solutions | Sistemas digitais para empresas ambiciosas",
+      title: "Criação de Sites Profissionais | Binah IT Solutions",
       description:
-        "A Binah IT cria sites corporativos, sistemas de aquisição e infraestrutura de TI para empresas prontas para crescer com clareza.",
+        "Criamos sites profissionais em Next.js para gerar confiança, contatos e oportunidades. Projetos responsivos, preparados para Google e anúncios, a partir de R$ 2.490.",
     },
     nav: {
       label: "Navegação principal",
-      services: "Especialidades",
+      services: "Criação de sites",
       work: "Projetos",
       approach: "Método",
       contact: "Contato",
@@ -369,81 +430,89 @@ export const copyByLocale = {
       languages: "Idioma",
     },
     hero: {
-      eyebrow: "Parceiro independente de tecnologia",
-      title: "Sistemas criados para empresas ambiciosas",
-      accent: "avançarem mais rápido.",
+      eyebrow: "Sites profissionais • Next.js • SEO",
+      title: "Criação de sites profissionais para empresas que querem",
+      accent: "gerar mais oportunidades.",
       description:
-        "Projetamos e construímos plataformas digitais de alta performance, sistemas de aquisição e infraestrutura de TI para empresas que superaram o improviso.",
-      primaryCta: "Solicitar avaliação estratégica",
-      secondaryCta: "Ver projetos selecionados",
-      note: "Todo projeto começa com alinhamento técnico e comercial.",
-      panelLabel: "Sistema de entrega Binah",
-      panelStatus: "Operacional",
-      panelTitle: "Uma estratégia. Três sistemas conectados.",
+        "Sites rápidos, responsivos e preparados para Google, Meta Ads, Google Ads e WhatsApp — do posicionamento ao lançamento, sem templates genéricos.",
+      primaryCta: "Receber proposta",
+      secondaryCta: "Ver projetos reais",
+      note: "Projetos a partir de R$ 2.490. Escopo e prazo definidos antes do início.",
+      panelLabel: "Projeto real",
+      panelStatus: "Publicado",
+      panelTitle: "Central do Crédito",
       panelItems: [
-        { label: "Plataforma digital", value: "Posicionar + converter" },
-        { label: "Sistema de demanda", value: "Atrair + medir" },
-        { label: "Base de TI", value: "Operar + escalar" },
+        { label: "Arquitetura", value: "Jornadas de serviço" },
+        { label: "Aquisição", value: "SEO + WhatsApp" },
+        { label: "Engenharia", value: "Next.js" },
       ],
-      panelFooter: "Estratégia → Construção → Validação → Evolução",
+      panelFooter: "Trabalho real. Escopo verificável. Sem métricas inventadas.",
     },
     trust: {
-      lead: "Um parceiro responsável do diagnóstico ao lançamento.",
-      items: ["Estratégia", "Design de experiência", "Engenharia", "Aquisição", "Infraestrutura"],
+      lead: "Entregáveis concretos da estratégia ao lançamento.",
+      items: ["Next.js", "Design responsivo", "SEO técnico", "Analytics", "WhatsApp"],
     },
     services: {
-      eyebrow: "O que construímos",
-      title: "Um parceiro para os sistemas dos quais seu crescimento depende.",
+      eyebrow: "Especialidade principal",
+      title: "O site vem primeiro. Aquisição e tecnologia ampliam o resultado.",
       description:
-        "Nada de entregas desconectadas. Criamos uma base comercial e técnica coerente com o próximo resultado do negócio.",
+        "A oferta principal é criação de sites profissionais. SEO, tráfego pago e infraestrutura entram como expansões quando fazem sentido para o negócio.",
       items: [
         {
           number: "01",
-          title: "Plataformas corporativas",
+          title: "Criação de sites profissionais",
           description:
-            "Sites e ambientes de conversão que ajudam compradores complexos a entender, confiar e agir.",
-          result: "Uma presença digital compatível com sua ambição comercial.",
-          deliverables: ["Posicionamento e UX", "Engenharia Next.js", "SEO e mensuração"],
+            "Sites institucionais e landing pages que explicam sua oferta, criam confiança e conduzem o visitante ao contato.",
+          result: "Um ativo comercial rápido, sustentável e pronto para campanhas.",
+          deliverables: ["Posicionamento e UX", "Desenvolvimento Next.js", "SEO técnico"],
         },
         {
           number: "02",
-          title: "Sistemas de aquisição",
+          title: "Aquisição e mensuração",
           description:
-            "Campanhas Meta e Google conectadas a páginas focadas, rastreamento limpo e uma jornada de lead qualificado.",
-          result: "Geração de demanda que pode ser lida e melhorada.",
-          deliverables: ["Oferta e funil", "Estrutura de campanha", "Rastreamento de conversão"],
+            "Campanhas Meta e Google conectadas a landing pages focadas, rastreamento limpo e uma jornada de lead qualificado.",
+          result: "Tráfego e dados de conversão que a empresa consegue utilizar.",
+          deliverables: ["Landing pages", "Meta / Google Ads", "Eventos de conversão"],
         },
         {
           number: "03",
-          title: "Bases de TI",
+          title: "Infraestrutura de TI empresarial",
           description:
-            "Redes, Wi-Fi empresarial e organização técnica para equipes que precisam de operação confiável.",
-          result: "Menos atrito operacional e menos correções improvisadas.",
+            "Uma frente separada para redes, Wi-Fi empresarial e organização técnica.",
+          result: "Operação confiável sem competir com a oferta de criação de sites.",
           deliverables: ["Diagnóstico técnico", "Arquitetura de rede", "Documentação"],
         },
       ],
     },
     work: {
-      eyebrow: "Projetos selecionados",
-      title: "Projetos com uma função clara.",
+      eyebrow: "Cases verificáveis",
+      title: "Projetos reais, explicados além da imagem.",
       description:
-        "Mostramos apenas o escopo que podemos comprovar — sem métricas inventadas. Cada projeto atende a uma função comercial concreta.",
-      view: "Visitar projeto no ar",
-      focusLabel: "Foco do projeto",
+        "Cada case apresenta desafio comercial, arquitetura de informação, implementação e evidências que podem ser conferidas no site publicado.",
+      view: "Visitar site no ar",
+      case: "Ver estudo de caso",
+      focusLabel: "Escopo verificável",
       projects: [
         {
           ...sharedProjects[0],
-          sector: "Beleza profissional",
+          sector: "Serviços financeiros",
           summary:
-            "Uma experiência corporativa de produto que organiza marca, catálogo e caminhos comerciais com mais clareza.",
-          focus: ["Hierarquia de marca", "Catálogo responsivo", "Navegação comercial"],
+            "Plataforma de aquisição em Next.js que organiza quatro jornadas de crédito, sinais de confiança, escolhas de privacidade e conversão por WhatsApp.",
+          focus: ["Páginas por modalidade", "SEO e consentimento", "Jornada de WhatsApp"],
         },
         {
           ...sharedProjects[1],
-          sector: "Engenharia e construção",
+          sector: "Beleza profissional",
           summary:
-            "Uma plataforma de serviços técnicos criada para explicar trabalhos complexos e conduzir clientes qualificados ao orçamento.",
-          focus: ["Clareza de serviços", "Credibilidade técnica", "Jornada de orçamento"],
+            "Experiência rica em produtos que conecta lançamentos, necessidades capilares, pontos de compra, distribuidores, eventos e educação.",
+          focus: ["Taxonomia de produtos", "Experiência de marca", "Jornada de distribuidores"],
+        },
+        {
+          ...sharedProjects[2],
+          sector: "Serviços para construção",
+          summary:
+            "Plataforma local que reúne escopo técnico, galeria de obras, avaliações de clientes e um caminho direto para orçamento.",
+          focus: ["SEO local", "Prova de serviço", "Jornada de orçamento"],
         },
       ],
     },
@@ -500,30 +569,40 @@ export const copyByLocale = {
       ],
     },
     engagements: {
-      eyebrow: "Modelos de projeto",
-      title: "Escopo orientado à decisão — não inflado com entregáveis.",
+      eyebrow: "Pontos de partida claros",
+      title: "Uma escada de ofertas para diferentes estágios.",
       description:
-        "Escolhemos o menor projeto capaz de resolver o problema real e sustentar a próxima etapa de crescimento.",
+        "Comece pelo menor escopo capaz de resolver a necessidade atual, preservando um caminho para campanhas, integrações e sistemas sob medida.",
       bestFor: "Ideal para",
       items: [
         {
-          title: "Projeto focado",
-          subtitle: "Um resultado comercial urgente",
-          text: "Uma plataforma, landing page ou intervenção técnica definida, com condição clara de lançamento.",
-          points: ["Escopo definido", "Um resultado responsável", "Entrega pronta para lançar"],
+          title: "Landing Page Estratégica",
+          price: "A partir de R$ 2.490",
+          subtitle: "Uma oferta ou campanha",
+          text: "Página focada em conversão para um serviço, produto ou campanha de mídia paga.",
+          points: ["Página responsiva", "SEO técnico", "WhatsApp ou formulário"],
         },
         {
-          title: "Sistema de crescimento",
-          subtitle: "Plataforma + aquisição + mensuração",
-          text: "Uma base conectada para empresas que precisam elevar posicionamento e gerar demanda qualificada.",
-          points: ["Escopo multidisciplinar", "Pronto para campanhas", "Base de mensuração"],
+          title: "Site Institucional Profissional",
+          price: "A partir de R$ 3.900",
+          subtitle: "Empresa, serviços e autoridade",
+          text: "Presença institucional completa para apresentar serviços, portfólio e gerar contatos qualificados.",
+          points: ["Páginas estratégicas", "Design responsivo", "Base para buscas"],
+        },
+        {
+          title: "Plataforma de Crescimento",
+          price: "A partir de R$ 5.900",
+          subtitle: "Site + aquisição + mensuração",
+          text: "Base conectada para posicionamento, campanhas pagas e leitura de conversões.",
+          points: ["Páginas para campanhas", "Base de Analytics", "Eventos de conversão"],
           featured: true,
         },
         {
-          title: "Programa sob medida",
-          subtitle: "Transformação complexa ou em fases",
-          text: "Para infraestrutura, múltiplos sites ou projetos entre áreas que exigem descoberta e implantação gradual.",
-          points: ["Fase de descoberta", "Roadmap por etapas", "Governança personalizada"],
+          title: "Sistema Sob Medida",
+          price: "A partir de R$ 10 mil",
+          subtitle: "Demandas complexas ou em fases",
+          text: "Para sites multilíngues, automações, integrações, portais e fluxos específicos do negócio.",
+          points: ["Fase de descoberta", "Arquitetura personalizada", "Roadmap por etapas"],
         },
       ],
     },
@@ -534,7 +613,7 @@ export const copyByLocale = {
         {
           question: "Qual nível de investimento faz sentido?",
           answer:
-            "O formulário de qualificação começa em R$ 5,9 mil. O investimento final depende do escopo, risco e número de frentes; só apresentamos proposta depois de entender o problema do negócio.",
+            "Landing pages estratégicas começam em R$ 2.490, sites institucionais em R$ 3.900, plataformas de crescimento em R$ 5.900 e sistemas sob medida em R$ 10 mil. O valor final depende do escopo confirmado.",
         },
         {
           question: "A Binah gerencia campanhas no Meta e Google?",
@@ -559,10 +638,10 @@ export const copyByLocale = {
       ],
     },
     contact: {
-      eyebrow: "Comece pelo contexto",
-      title: "Traga o problema de negócio. Definiremos o sistema certo.",
+      eyebrow: "Qualificação rápida",
+      title: "Descubra qual site cabe no seu orçamento.",
       description:
-        "Compartilhe resultado, restrição e cenário atual. Você recebe uma resposta direta sobre aderência e próximo passo.",
+        "Envie quatro informações iniciais. Os detalhes restantes são tratados pelo WhatsApp, sem transformar o primeiro contato em uma entrevista.",
       promiseTitle: "O que acontece depois",
       promiseItems: [
         "Analisamos aderência comercial e técnica.",
@@ -572,8 +651,8 @@ export const copyByLocale = {
       direct: "Prefere uma conversa direta?",
       whatsapp: "Abrir WhatsApp",
       form: {
-        title: "Avaliação de projeto",
-        intro: "Campos marcados com * são obrigatórios.",
+        title: "Receber proposta",
+        intro: "Quatro campos rápidos. O detalhamento acontece na conversa seguinte.",
         name: "Nome completo",
         namePlaceholder: "Seu nome",
         email: "E-mail profissional",
@@ -592,18 +671,18 @@ export const copyByLocale = {
           "O que precisa mudar, por que agora e como seria um resultado bem-sucedido?",
         consent:
           "Autorizo a Binah IT Solutions a entrar em contato sobre esta solicitação e concordo com o aviso de privacidade.",
-        submit: "Solicitar avaliação",
+        submit: "Receber proposta",
         submitting: "Enviando...",
         privacy: "Aviso de privacidade",
         serviceOptions: [
-          "Site ou plataforma corporativa",
-          "Landing pages e aquisição",
+          "Landing page estratégica",
+          "Site institucional profissional",
+          "Plataforma de crescimento",
+          "Site ou sistema sob medida",
           "Meta / Google Ads",
           "Infraestrutura de TI e redes",
-          "Sistema conectado de crescimento",
-          "Preciso de ajuda para definir o escopo",
         ],
-        budgetOptions: ["R$ 5,9 mil–10 mil", "R$ 10 mil–25 mil", "R$ 25 mil+", "Definir após diagnóstico"],
+        budgetOptions: ["R$ 2,4–3,9 mil", "R$ 3,9–5,9 mil", "R$ 5,9–10 mil", "R$ 10 mil+"],
         timelineOptions: ["Assim que o escopo estiver claro", "Em 1–2 meses", "Em 3–6 meses", "Planejamento futuro"],
         select: "Selecione uma opção",
         errors: {
@@ -618,7 +697,7 @@ export const copyByLocale = {
           consent: "A autorização é necessária para respondermos.",
         },
         success:
-          "Solicitação enviada. Vamos analisar o contexto e responder com o próximo passo.",
+          "Solicitação enviada. Vamos analisar o tipo de projeto e o orçamento, depois responder pelo WhatsApp.",
         failure:
           "Não foi possível enviar agora. Entre em contato diretamente pelo WhatsApp.",
       },
@@ -639,13 +718,13 @@ export const copyByLocale = {
   },
   es: {
     metadata: {
-      title: "Binah IT Solutions | Sistemas digitales para empresas ambiciosas",
+      title: "Desarrollo de Sitios Web Profesionales | Binah IT Solutions",
       description:
-        "Binah IT crea sitios corporativos, sistemas de adquisición e infraestructura de TI para empresas preparadas para crecer con claridad.",
+        "Creamos sitios profesionales en Next.js para generar confianza, contactos y oportunidades. Proyectos preparados para Google y anuncios desde R$ 2.490.",
     },
     nav: {
       label: "Navegación principal",
-      services: "Especialidades",
+      services: "Sitios web",
       work: "Proyectos",
       approach: "Método",
       contact: "Contacto",
@@ -655,81 +734,89 @@ export const copyByLocale = {
       languages: "Idioma",
     },
     hero: {
-      eyebrow: "Socio tecnológico independiente",
-      title: "Sistemas creados para que empresas ambiciosas",
-      accent: "avancen más rápido.",
+      eyebrow: "Sitios profesionales • Next.js • SEO",
+      title: "Sitios web profesionales para empresas que quieren",
+      accent: "generar más oportunidades.",
       description:
-        "Diseñamos y construimos plataformas digitales de alto rendimiento, sistemas de adquisición y bases de TI para empresas que han superado la improvisación.",
-      primaryCta: "Solicitar evaluación estratégica",
-      secondaryCta: "Ver proyectos seleccionados",
-      note: "Cada proyecto comienza con alineación técnica y comercial.",
-      panelLabel: "Sistema de entrega Binah",
-      panelStatus: "Operativo",
-      panelTitle: "Una estrategia. Tres sistemas conectados.",
+        "Sitios rápidos, adaptables y preparados para Google, Meta Ads, Google Ads y WhatsApp, desde el posicionamiento hasta el lanzamiento.",
+      primaryCta: "Solicitar propuesta",
+      secondaryCta: "Ver proyectos reales",
+      note: "Proyectos desde R$ 2.490. Alcance y plazo definidos antes de comenzar.",
+      panelLabel: "Proyecto real",
+      panelStatus: "Publicado",
+      panelTitle: "Central do Crédito",
       panelItems: [
-        { label: "Plataforma digital", value: "Posicionar + convertir" },
-        { label: "Sistema de demanda", value: "Atraer + medir" },
-        { label: "Base de TI", value: "Operar + escalar" },
+        { label: "Arquitectura", value: "Recorridos de servicio" },
+        { label: "Adquisición", value: "SEO + WhatsApp" },
+        { label: "Ingeniería", value: "Next.js" },
       ],
-      panelFooter: "Estrategia → Construcción → Validación → Mejora",
+      panelFooter: "Trabajo real. Alcance verificable. Sin métricas inventadas.",
     },
     trust: {
-      lead: "Un socio responsable desde el diagnóstico hasta el lanzamiento.",
-      items: ["Estrategia", "Diseño de experiencia", "Ingeniería", "Adquisición", "Infraestructura"],
+      lead: "Entregables concretos desde la estrategia hasta el lanzamiento.",
+      items: ["Next.js", "Diseño adaptable", "SEO técnico", "Analytics", "WhatsApp"],
     },
     services: {
-      eyebrow: "Lo que construimos",
-      title: "Un socio para los sistemas de los que depende su crecimiento.",
+      eyebrow: "Especialidad principal",
+      title: "El sitio viene primero. Adquisición y tecnología amplían el resultado.",
       description:
-        "Sin entregables desconectados. Creamos una base comercial y técnica coherente con el próximo resultado del negocio.",
+        "La oferta principal es el desarrollo de sitios profesionales. SEO, medios pagos e infraestructura se agregan cuando el negocio lo necesita.",
       items: [
         {
           number: "01",
-          title: "Plataformas corporativas",
+          title: "Sitios web profesionales",
           description:
-            "Sitios y entornos de conversión que ayudan a compradores complejos a entender, confiar y actuar.",
-          result: "Una presencia digital a la altura de su ambición comercial.",
-          deliverables: ["Posicionamiento y UX", "Ingeniería Next.js", "SEO y medición"],
+            "Sitios corporativos y landing pages que explican la oferta, generan confianza y llevan al visitante al contacto.",
+          result: "Un activo comercial rápido, mantenible y preparado para campañas.",
+          deliverables: ["Posicionamiento y UX", "Desarrollo Next.js", "SEO técnico"],
         },
         {
           number: "02",
-          title: "Sistemas de adquisición",
+          title: "Adquisición y medición",
           description:
-            "Campañas de Meta y Google conectadas con páginas enfocadas, seguimiento limpio y un recorrido de lead calificado.",
-          result: "Generación de demanda que se puede leer y mejorar.",
-          deliverables: ["Oferta y embudo", "Estructura de campañas", "Seguimiento de conversión"],
+            "Campañas de Meta y Google conectadas con landing pages enfocadas, seguimiento limpio y un recorrido calificado.",
+          result: "Tráfico y datos de conversión que la empresa puede utilizar.",
+          deliverables: ["Landing pages", "Meta / Google Ads", "Eventos de conversión"],
         },
         {
           number: "03",
-          title: "Bases de TI",
+          title: "Infraestructura de TI empresarial",
           description:
-            "Redes, Wi-Fi empresarial y organización técnica para equipos que necesitan operaciones confiables.",
-          result: "Menos fricción operativa y menos soluciones improvisadas.",
+            "Una línea separada para redes, Wi-Fi empresarial y organización técnica.",
+          result: "Operaciones confiables sin competir con la oferta de sitios web.",
           deliverables: ["Diagnóstico técnico", "Arquitectura de red", "Documentación"],
         },
       ],
     },
     work: {
-      eyebrow: "Proyectos seleccionados",
-      title: "Proyectos con una función clara.",
+      eyebrow: "Casos verificables",
+      title: "Proyectos reales, explicados más allá de la imagen.",
       description:
-        "Mostramos solo el alcance que podemos comprobar, sin métricas inventadas. Cada proyecto responde a una función comercial concreta.",
-      view: "Visitar proyecto en vivo",
-      focusLabel: "Enfoque del proyecto",
+        "Cada caso presenta el desafío comercial, la arquitectura de información, la implementación y evidencias visibles en el sitio publicado.",
+      view: "Visitar sitio en vivo",
+      case: "Ver caso de estudio",
+      focusLabel: "Alcance verificable",
       projects: [
         {
           ...sharedProjects[0],
-          sector: "Belleza profesional",
+          sector: "Servicios financieros",
           summary:
-            "Una experiencia corporativa de producto que estructura con claridad la marca, el catálogo y los recorridos comerciales.",
-          focus: ["Jerarquía de marca", "Catálogo adaptable", "Navegación comercial"],
+            "Plataforma de adquisición en Next.js que organiza cuatro recorridos de crédito, señales de confianza, privacidad y conversión por WhatsApp.",
+          focus: ["Páginas por modalidad", "SEO y consentimiento", "Recorrido de WhatsApp"],
         },
         {
           ...sharedProjects[1],
-          sector: "Ingeniería y construcción",
+          sector: "Belleza profesional",
           summary:
-            "Una plataforma de servicios técnicos creada para explicar trabajos complejos y llevar clientes calificados a una cotización.",
-          focus: ["Claridad de servicios", "Credibilidad técnica", "Recorrido de cotización"],
+            "Experiencia de producto que conecta lanzamientos, necesidades capilares, puntos de compra, distribuidores, eventos y educación.",
+          focus: ["Taxonomía de productos", "Experiencia de marca", "Distribuidores"],
+        },
+        {
+          ...sharedProjects[2],
+          sector: "Servicios para construcción",
+          summary:
+            "Plataforma local con alcance técnico, galería de obras, reseñas de clientes y un camino directo a la cotización.",
+          focus: ["SEO local", "Prueba de servicio", "Recorrido de cotización"],
         },
       ],
     },
@@ -786,30 +873,40 @@ export const copyByLocale = {
       ],
     },
     engagements: {
-      eyebrow: "Modelos de proyecto",
-      title: "Alcance orientado a la decisión, no inflado con entregables.",
+      eyebrow: "Puntos de partida claros",
+      title: "Una escalera de ofertas para distintas etapas.",
       description:
-        "Elegimos el proyecto más pequeño capaz de resolver el problema real y sostener la siguiente etapa de crecimiento.",
+        "Comience con el menor alcance que resuelva la necesidad actual, manteniendo un camino hacia campañas, integraciones y sistemas a medida.",
       bestFor: "Ideal para",
       items: [
         {
-          title: "Proyecto enfocado",
-          subtitle: "Un resultado comercial urgente",
-          text: "Una plataforma, landing page o intervención técnica definida, con una condición clara de lanzamiento.",
-          points: ["Alcance definido", "Un resultado responsable", "Entrega lista para lanzar"],
+          title: "Landing page estratégica",
+          price: "Desde R$ 2.490",
+          subtitle: "Una oferta o campaña",
+          text: "Página enfocada en conversión para un servicio, producto o campaña de medios pagos.",
+          points: ["Página adaptable", "SEO técnico", "WhatsApp o formulario"],
         },
         {
-          title: "Sistema de crecimiento",
-          subtitle: "Plataforma + adquisición + medición",
-          text: "Una base conectada para empresas que necesitan elevar su posicionamiento y generar demanda calificada.",
-          points: ["Alcance multidisciplinario", "Preparado para campañas", "Base de medición"],
+          title: "Sitio corporativo profesional",
+          price: "Desde R$ 3.900",
+          subtitle: "Empresa, servicios y autoridad",
+          text: "Presencia institucional completa para presentar servicios, portafolio y generar contactos calificados.",
+          points: ["Páginas estratégicas", "Diseño adaptable", "Base para búsquedas"],
+        },
+        {
+          title: "Plataforma de crecimiento",
+          price: "Desde R$ 5.900",
+          subtitle: "Sitio + adquisición + medición",
+          text: "Una base conectada para posicionamiento, campañas pagas y medición de conversiones.",
+          points: ["Páginas para campañas", "Base de Analytics", "Eventos de conversión"],
           featured: true,
         },
         {
-          title: "Programa a medida",
-          subtitle: "Transformación compleja o por fases",
-          text: "Para infraestructura, múltiples sitios o proyectos entre áreas que exigen descubrimiento y entrega gradual.",
-          points: ["Fase de descubrimiento", "Hoja de ruta por etapas", "Gobernanza personalizada"],
+          title: "Sistema a medida",
+          price: "Desde R$ 10 mil",
+          subtitle: "Necesidades complejas o por fases",
+          text: "Para sitios multilingües, automatizaciones, integraciones, portales y flujos específicos.",
+          points: ["Fase de descubrimiento", "Arquitectura personalizada", "Hoja de ruta"],
         },
       ],
     },
@@ -820,7 +917,7 @@ export const copyByLocale = {
         {
           question: "¿Qué nivel de inversión encaja?",
           answer:
-            "El formulario de calificación comienza en USD 5k. La inversión final depende del alcance, el riesgo y la cantidad de frentes; solo cotizamos después de entender el problema de negocio.",
+            "Las landing pages estratégicas comienzan en R$ 2.490, los sitios corporativos en R$ 3.900, las plataformas de crecimiento en R$ 5.900 y los sistemas a medida en R$ 10 mil. El valor final depende del alcance confirmado.",
         },
         {
           question: "¿Binah gestiona campañas en Meta y Google?",
@@ -845,10 +942,10 @@ export const copyByLocale = {
       ],
     },
     contact: {
-      eyebrow: "Comience por el contexto",
-      title: "Traiga el problema de negocio. Definiremos el sistema correcto.",
+      eyebrow: "Calificación rápida",
+      title: "Descubra qué sitio encaja en su presupuesto.",
       description:
-        "Comparta el resultado, la restricción y la situación actual. Recibirá una respuesta directa sobre encaje y siguiente paso.",
+        "Envíe cuatro datos iniciales. Los detalles restantes se tratan por WhatsApp sin convertir el primer contacto en una entrevista.",
       promiseTitle: "Qué sucede después",
       promiseItems: [
         "Revisamos el encaje comercial y técnico.",
@@ -858,8 +955,8 @@ export const copyByLocale = {
       direct: "¿Prefiere una conversación directa?",
       whatsapp: "Abrir WhatsApp",
       form: {
-        title: "Evaluación de proyecto",
-        intro: "Los campos marcados con * son obligatorios.",
+        title: "Solicitar propuesta",
+        intro: "Cuatro campos rápidos. El alcance detallado se define en la siguiente conversación.",
         name: "Nombre completo",
         namePlaceholder: "Su nombre",
         email: "Correo corporativo",
@@ -878,18 +975,18 @@ export const copyByLocale = {
           "¿Qué debe cambiar, por qué ahora y cómo sería un resultado exitoso?",
         consent:
           "Autorizo a Binah IT Solutions a contactarme sobre esta solicitud y acepto el aviso de privacidad.",
-        submit: "Solicitar evaluación",
+        submit: "Solicitar propuesta",
         submitting: "Enviando...",
         privacy: "Aviso de privacidad",
         serviceOptions: [
-          "Sitio o plataforma corporativa",
-          "Landing pages y adquisición",
+          "Landing page estratégica",
+          "Sitio corporativo profesional",
+          "Plataforma de crecimiento",
+          "Sitio o sistema a medida",
           "Meta / Google Ads",
           "Infraestructura de TI y redes",
-          "Sistema conectado de crecimiento",
-          "Necesito ayuda para definir el alcance",
         ],
-        budgetOptions: ["USD 5k–10k", "USD 10k–25k", "USD 25k+", "Definir tras el diagnóstico"],
+        budgetOptions: ["R$ 2,4–3,9 mil", "R$ 3,9–5,9 mil", "R$ 5,9–10 mil", "R$ 10 mil+"],
         timelineOptions: ["Cuando el alcance esté claro", "En 1–2 meses", "En 3–6 meses", "Planificación futura"],
         select: "Seleccione una opción",
         errors: {
@@ -904,7 +1001,7 @@ export const copyByLocale = {
           consent: "La autorización es necesaria para responder.",
         },
         success:
-          "Solicitud enviada. Revisaremos el contexto y responderemos con el siguiente paso.",
+          "Solicitud enviada. Revisaremos el tipo de proyecto y el presupuesto, luego responderemos por WhatsApp.",
         failure:
           "No fue posible enviar el formulario. Contáctenos directamente por WhatsApp.",
       },
@@ -965,7 +1062,7 @@ export const privacyByLocale = {
       {
         title: "Your choices and contact",
         paragraphs: [
-          "You may request access, correction or deletion of information you submitted by emailing binahitsolutions@gmail.com.",
+          `You may request access, correction or deletion of information you submitted by emailing ${contact.email}.`,
         ],
       },
     ],
@@ -1006,7 +1103,7 @@ export const privacyByLocale = {
       {
         title: "Seus direitos e contato",
         paragraphs: [
-          "Você pode solicitar acesso, correção ou exclusão dos dados enviados pelo e-mail binahitsolutions@gmail.com.",
+          `Você pode solicitar acesso, correção ou exclusão dos dados enviados pelo e-mail ${contact.email}.`,
         ],
       },
     ],
@@ -1047,7 +1144,7 @@ export const privacyByLocale = {
       {
         title: "Sus opciones y contacto",
         paragraphs: [
-          "Puede solicitar acceso, corrección o eliminación de los datos enviados escribiendo a binahitsolutions@gmail.com.",
+          `Puede solicitar acceso, corrección o eliminación de los datos enviados escribiendo a ${contact.email}.`,
         ],
       },
     ],
